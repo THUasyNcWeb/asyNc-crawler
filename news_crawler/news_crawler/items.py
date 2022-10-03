@@ -1,12 +1,13 @@
-# Define here the models for your scraped items
-#
-# See documentation in:
-# https://docs.scrapy.org/en/latest/topics/items.html
-
 import scrapy
 
 
 class NewsCrawlerItem(scrapy.Item):
-    # define the fields for your item here like:
-    # name = scrapy.Field()
-    pass
+    news_url = scrapy.Field()
+    category = scrapy.Field()
+    source = scrapy.Field()
+    key_words = scrapy.Field()
+    title = scrapy.Field()
+    summary = scrapy.Field()
+    content = scrapy.Field()
+    first_img_url = scrapy.Field()
+    date = scrapy.Field()
