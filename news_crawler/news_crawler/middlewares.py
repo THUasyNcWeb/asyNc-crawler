@@ -3,7 +3,12 @@
 # See documentation in:
 # https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 
+from asyncio import sleep
 from scrapy import signals
+import scrapy
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait as wdw
+from selenium.webdriver.support import expected_conditions as EC
 
 # useful for handling different item types with a single interface
 from itemadapter import is_item, ItemAdapter
@@ -87,6 +92,20 @@ class NewsCrawlerDownloaderMiddleware:
         # - return a Response object
         # - return a Request object
         # - or raise IgnoreRequest
+        driver = spider.driver
+        driver.get(request.url)
+        sleep(2)
+        wdw(driver, 5).until(EC.presence_of_element_located(
+            (By.ID, 'ariaTipText')))
+        while(True):
+            load_more = driver.find_elements(By.XPATH, '//div[@id="load-more"]/a')
+            if len(load_more) == 1:
+                break
+            driver.execute_script("window.scrollTo(0,document.body.scrollHeight)")
+            sleep(10)
+            
+        response = scrapy.http.HtmlResponse(url=request.url, body=driver.page_source, request=request, encoding='utf-8')
+
         return response
 
     def process_exception(self, request, exception, spider):
