@@ -9,6 +9,7 @@ import scrapy
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait as wdw
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.action_chains import ActionChains
 
 # useful for handling different item types with a single interface
 from itemadapter import is_item, ItemAdapter
@@ -92,19 +93,30 @@ class NewsCrawlerDownloaderMiddleware:
         # - return a Response object
         # - return a Request object
         # - or raise IgnoreRequest
-        driver = spider.driver
-        driver.get(request.url)
-        sleep(2)
-        wdw(driver, 5).until(EC.presence_of_element_located(
-            (By.ID, 'ariaTipText')))
-        while(True):
-            load_more = driver.find_elements(By.XPATH, '//div[@id="load-more"]/a')
-            if len(load_more) == 1:
-                break
-            driver.execute_script("window.scrollTo(0,document.body.scrollHeight)")
-            sleep(10)
-            
-        response = scrapy.http.HtmlResponse(url=request.url, body=driver.page_source, request=request, encoding='utf-8')
+
+        if request.url in spider.start_urls:
+            driver = spider.driver
+            driver.get(request.url)
+            wdw(driver, 5).until(EC.visibility_of_element_located(
+                (By.ID, 'load-more')))
+            last_num = 1
+            ac = ActionChains(driver)
+            while(True):
+                load_more = driver.find_elements(By.XPATH, '//div[@id="load-more"]/a')
+                if len(load_more) == 1:
+                    break
+                img_num = len(driver.find_elements(By.XPATH, '//*[@class="item cf itme-ls"]'))
+                # driver.execute_script("window.scrollTo(0,document.body.scrollHeight)")
+                while last_num <= img_num:
+                    ac.move_to_element(driver.find_element('xpath', '//*[@class="item cf itme-ls"][{}]'.format(last_num))).perform()
+                    wdw(driver, 5).until(EC.visibility_of_all_elements_located(
+                        (By.XPATH, '//*[@class="item cf itme-ls"][{}]/a/img'.format(last_num))))
+                    last_num += 1
+                # break
+            file = open('test.html', 'w', encoding='utf-8')
+            file.write(str(driver.page_source))
+            file.close()
+            response = scrapy.http.HtmlResponse(url=request.url, body=driver.page_source, request=request, encoding='utf-8')
 
         return response
 
