@@ -4,13 +4,14 @@ from selenium.webdriver import ChromeOptions
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.service import Service as ChromeService
 from scrapy.http import Request
+import re
 
 from news_crawler.items import NewsCrawlerItem, NewsCrawlerItemLoader
 
 
 class QqSpider(scrapy.Spider):
     name = 'qq'
-    allowed_domains = ['news.qq.com']
+    allowed_domains = ['news.qq.com', 'new.qq.com']
     start_urls = ['https://news.qq.com/']
 
     def __init__(self):
@@ -28,6 +29,8 @@ class QqSpider(scrapy.Spider):
             'excludeSwitches', ['enable-automation', 'enable-logging'])
         self.driver = webdriver.Chrome(service=ChromeService(
             ChromeDriverManager().install()), options=option)
+        # self.driver = webdriver.Chrome(service=ChromeService(
+        #     ChromeDriverManager().install()))
 
     def close(self, spider):
         self.driver.quit()
@@ -35,17 +38,28 @@ class QqSpider(scrapy.Spider):
     def parse(self, response):
         news_nodes = response.xpath('//*[@class="item cf itme-ls"]')
         for news_node in news_nodes:
-            item_loader = NewsCrawlerItemLoader(
-                item=NewsCrawlerItem(), selector=news_node)
-            # image_url = news_node.xpath('./a/img/@src').get()
+            image_url = news_node.xpath('./a/img/@src').get()
             news_url = news_node.xpath('./div/h3/a/@href').get()
-            # source = news_node.xpath('./div/div[2]/div[1]/a/text()').get()
-            item_loader.add_xpath('first_img_url', './a/img/@src')
-            item_loader.add_value('news_url', news_url)
-            item_loader.add_xpath('source', './div/div[2]/div[1]/a/text()')
-            yield Request(url=news_url, meta={"item_loader": item_loader},
+            yield Request(url=news_url, meta={"image_url": image_url},
                           callback=self.parse_news)
-            break
 
     def parse_news(self, response):
-        pass
+        item_loader = NewsCrawlerItemLoader(
+                item=NewsCrawlerItem(), response=response)
+
+        item_loader.add_value('news_url', response.url)
+        window_data = response.xpath('/html/head/script[7]/text()').extract_first()
+        item_loader.add_value('media', re.findall('"media": "(.*?)"', window_data)[0])
+        for catalog in re.findall('"catalog\d+": "(.*?)"', window_data):
+            item_loader.add_value('category', catalog)
+        for tag in re.findall('"tags": "(.*?)"', window_data)[0].split(','):
+            item_loader.add_value('tags', tag)
+        item_loader.add_xpath('title', '/html/head/title/text()')
+        item_loader.add_xpath('description', '/html/head/meta[2]/text()')
+        item_loader.add_value('first_img_url', response.meta.get('image_url'))
+        item_loader.add_xpath('pub_time', '/html/head/meta[3]/@content')
+
+        for para in response.xpath('/html/body/div[3]/div[1]/div[1]/div[2]/p/text()').extract():
+            item_loader.add_value('content', para)
+
+        yield item_loader.load_item()

@@ -113,9 +113,9 @@ class NewsCrawlerDownloaderMiddleware:
                         (By.XPATH, '//*[@class="item cf itme-ls"][{}]/a/img'.format(last_num))))
                     last_num += 1
                 # break
-            file = open('test.html', 'w', encoding='utf-8')
-            file.write(str(driver.page_source))
-            file.close()
+            # file = open('test.html', 'w', encoding='utf-8')
+            # file.write(str(driver.page_source))
+            # file.close()
             response = scrapy.http.HtmlResponse(url=request.url, body=driver.page_source, request=request, encoding='utf-8')
 
         return response
