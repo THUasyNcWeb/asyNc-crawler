@@ -65,6 +65,7 @@ DOWNLOADER_MIDDLEWARES = {
 ITEM_PIPELINES = {
    # 'news_crawler.pipelines.NewsCrawlerPipeline': 300,
    'news_crawler.pipelines.JsonExporterPipleline': 300,
+   'news_crawler.pipelines.PostgreSQLPipline': 200,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
