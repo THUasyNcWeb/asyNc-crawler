@@ -59,7 +59,7 @@ class PostgreSQLPipline(object):
                 host=self.hostname, port=self.port, user=self.username, password=self.password, dbname=self.database)
             self.cur = self.connection.cursor()
 
-            file = open('insert_error.json', 'wb')
+            file = open('insert_error.json', 'ab')
             JsonItemExporter(file, encoding="utf-8", ensure_ascii=False).export_item(item)
             file.close()
         
