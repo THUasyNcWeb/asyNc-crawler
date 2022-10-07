@@ -3,20 +3,6 @@ from scrapy.exporters import JsonItemExporter
 import psycopg2
 
 
-class NewsCrawlerPipeline:
-    def process_item(self, item, spider):
-        pass
-
-    def open_spider(self, spider):
-        pass
-
-    def close_spider(self, spider):
-        pass
-
-    def process_item(self, item, spider):
-        pass
-
-
 class JsonExporterPipleline(object):
     def __init__(self):
         self.file = open('test.json', 'wb')

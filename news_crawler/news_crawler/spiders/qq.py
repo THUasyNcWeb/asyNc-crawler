@@ -9,8 +9,8 @@ import re
 from news_crawler.items import NewsCrawlerItem, NewsCrawlerItemLoader
 
 
-class QqSpider(scrapy.Spider):
-    name = 'qq'
+class QqHomePageSpider(scrapy.Spider):
+    name = 'QqHomePage'
     allowed_domains = ['news.qq.com', 'new.qq.com']
     start_urls = ['https://news.qq.com/']
 
@@ -29,8 +29,10 @@ class QqSpider(scrapy.Spider):
             'excludeSwitches', ['enable-automation', 'enable-logging'])
         self.driver = webdriver.Chrome(service=ChromeService(
             ChromeDriverManager().install()), options=option)
-        # self.driver = webdriver.Chrome(service=ChromeService(
-        #     ChromeDriverManager().install()))
+
+    def start_requests(self):
+        for url in self.start_urls:
+            yield Request(url, dont_filter=True, meta={'crawler': 'QqHomePage'})
 
     def close(self, spider):
         self.driver.quit()
@@ -45,11 +47,13 @@ class QqSpider(scrapy.Spider):
 
     def parse_news(self, response):
         item_loader = NewsCrawlerItemLoader(
-                item=NewsCrawlerItem(), response=response)
+            item=NewsCrawlerItem(), response=response)
 
         item_loader.add_value('news_url', response.url)
-        window_data = response.xpath('/html/head/script[7]/text()').extract_first()
-        item_loader.add_value('media', re.findall('"media": "(.*?)"', window_data)[0])
+        window_data = response.xpath(
+            '/html/head/script[7]/text()').extract_first()
+        item_loader.add_value('media', re.findall(
+            '"media": "(.*?)"', window_data)[0])
         for catalog in re.findall('"catalog\d+": "(.*?)"', window_data):
             item_loader.add_value('category', catalog)
         for tag in re.findall('"tags": "(.*?)"', window_data)[0].split(','):
@@ -57,8 +61,10 @@ class QqSpider(scrapy.Spider):
         item_loader.add_xpath('title', '/html/head/title/text()')
         item_loader.add_xpath('description', '/html/head/meta[2]/@content')
         item_loader.add_value('first_img_url', response.meta.get('image_url'))
-        item_loader.add_value('pub_time', re.findall('"pubtime": "(.*?)"', window_data)[0])
-        paras = response.xpath('/html/body/div[3]/div[1]/div[1]/div[2]/p/text()').extract()
+        item_loader.add_value('pub_time', re.findall(
+            '"pubtime": "(.*?)"', window_data)[0])
+        paras = response.xpath(
+            '/html/body/div[3]/div[1]/div[1]/div[2]/p/text()').extract()
         if len(paras) == 0:
             paras.append('')
         for para in paras:
