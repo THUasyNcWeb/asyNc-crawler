@@ -22,7 +22,7 @@ class JsonExporterPipleline(object):
 
 class PostgreSQLPipline(object):
     def open_spider(self, spider):
-        with open('../../config.json', 'r') as f:
+        with open('../config/config.json', 'r') as f:
             config = json.load(f)
         self.hostname = config['hostname']
         self.port = config['port']
