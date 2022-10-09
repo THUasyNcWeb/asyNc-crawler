@@ -4,3 +4,4 @@ __pycache__/
 test.json
 test.ipynb
 insert_error.json
+config.json
