@@ -3,8 +3,15 @@ from scrapy.loader import ItemLoader
 from itemloaders.processors import Join, MapCompose, TakeFirst, Identity
 
 
+class TakeFirstAnything:
+    def __call__(self, values):
+        for value in values:
+            if value is not None:
+                return value
+
+
 class NewsCrawlerItemLoader(ItemLoader):
-    default_output_processor = TakeFirst()
+    default_output_processor = TakeFirstAnything()
 
 
 class NewsCrawlerItem(scrapy.Item):

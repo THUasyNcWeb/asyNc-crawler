@@ -3,3 +3,4 @@ __pycache__/
 *.html
 test.json
 test.ipynb
+insert_error.json

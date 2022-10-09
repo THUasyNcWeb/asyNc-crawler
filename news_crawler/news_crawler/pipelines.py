@@ -3,20 +3,6 @@ from scrapy.exporters import JsonItemExporter
 import psycopg2
 
 
-class NewsCrawlerPipeline:
-    def process_item(self, item, spider):
-        pass
-
-    def open_spider(self, spider):
-        pass
-
-    def close_spider(self, spider):
-        pass
-
-    def process_item(self, item, spider):
-        pass
-
-
 class JsonExporterPipleline(object):
     def __init__(self):
         self.file = open('test.json', 'wb')
@@ -59,7 +45,7 @@ class PostgreSQLPipline(object):
                 host=self.hostname, port=self.port, user=self.username, password=self.password, dbname=self.database)
             self.cur = self.connection.cursor()
 
-            file = open('insert_error.json', 'wb')
+            file = open('insert_error.json', 'ab')
             JsonItemExporter(file, encoding="utf-8", ensure_ascii=False).export_item(item)
             file.close()
         
