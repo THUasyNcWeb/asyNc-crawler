@@ -1,0 +1,6 @@
+psycopg2
+Scrapy
+selenium
+lxml
+webdriver_manager
+json
