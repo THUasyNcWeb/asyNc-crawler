@@ -1,6 +1,7 @@
 from tkinter import INSERT
 from scrapy.exporters import JsonItemExporter
 import psycopg2
+import json
 
 
 class JsonExporterPipleline(object):
@@ -21,11 +22,13 @@ class JsonExporterPipleline(object):
 
 class PostgreSQLPipline(object):
     def open_spider(self, spider):
-        self.hostname = '127.0.0.1'
-        self.port = '5432'
-        self.username = 'postgres'
-        self.password = 'kming'
-        self.database = 'web'
+        with open('../../config.json', 'r') as f:
+            config = json.load(f)
+        self.hostname = config['hostname']
+        self.port = config['port']
+        self.username = config['username']
+        self.password = config['password']
+        self.database = config['database']
         self.connection = psycopg2.connect(
             host=self.hostname, port=self.port, user=self.username, password=self.password, dbname=self.database)
         self.cur = self.connection.cursor()
