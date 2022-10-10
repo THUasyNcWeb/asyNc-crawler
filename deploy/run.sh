@@ -1,0 +1,2 @@
+cd news_crawler
+scrapy crawl QqAllQuantity
