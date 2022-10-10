@@ -75,7 +75,6 @@ class QqHomePageSpider(scrapy.Spider):
             yield Request(url=news_url, meta={"image_url": image_url},
                           callback=parse_qq_news)
 
-# https://new.qq.com/rain/a/20221007A01LVJ00
 class QqAllQuantitySpider(scrapy.Spider):
     name = 'QqAllQuantity'
     allowed_domains = ['new.qq.com']
@@ -89,20 +88,16 @@ class QqAllQuantitySpider(scrapy.Spider):
         self.legal_first = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
 
     def start_requests(self):
-        # num = 0
         for date in (self.begin_date, self.end_date + 1):
-            for i in self.legal:
+            for i in self.legal_first:
                 for j in self.legal:
                     for k in self.legal:
                         for p in self.legal:
-                            # if num > 100000:
-                            #     break
                             url = 'https://new.qq.com/rain/a/' + str(date) + 'A0' + i + j + k + p + '00'
                             yield Request(url, dont_filter=True)
-        # url = 'https://new.qq.com/rain/a/' + str('20221007') + 'A0' + '1' + 'L' + 'V' + 'J' + '00'
-        # yield Request(url, dont_filter=True)
+                            url = 'https://new.qq.com/rain/a/' + str(date) + 'V0' + i + j + k + p + '00'
+                            yield Request(url, dont_filter=True)
 
     def parse(self, response):
         if response.status == 200:
             yield Request(url=response.url, callback=parse_qq_news)
-            # parse_qq_news(response)
