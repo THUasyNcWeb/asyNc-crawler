@@ -3,3 +3,4 @@ Scrapy
 selenium
 lxml
 webdriver_manager
+elasticsearch_dsl

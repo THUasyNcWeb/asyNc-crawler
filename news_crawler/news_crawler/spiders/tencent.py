@@ -55,7 +55,8 @@ class TencentNewsHomePageSpider(scrapy.Spider):
         Begin the request
         '''
         for url in self.start_urls:
-            yield Request(url, dont_filter=True, meta={'crawler': 'TencentNewsHomePage'})
+            yield Request(url, dont_filter=True,
+                          meta={'crawler': 'TencentNewsHomePage'})
 
     def parse(self, response, **_kwargs):
         '''
@@ -100,10 +101,12 @@ class TencentNewsAllQuantitySpider(scrapy.Spider):
                     for third in self.legal:
                         for forth in self.legal:
                             url = 'https://new.qq.com/rain/a/' + \
-                                str(date) + 'A0' + first + second + third + forth + '00'
+                                  str(date) + 'A0' + first + second + \
+                                  third + forth + '00'
                             yield Request(url, dont_filter=True)
                             url = 'https://new.qq.com/rain/a/' + \
-                                str(date) + 'V0' + first + second + third + forth + '00'
+                                  str(date) + 'V0' + first + second + \
+                                  third + forth + '00'
                             yield Request(url, dont_filter=True)
 
     def parse(self, response, **_kwargs):

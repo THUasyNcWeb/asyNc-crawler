@@ -33,13 +33,16 @@ class PostgreSQLPipeline:
         Insert the item into the database
         '''
         try:
-            self.cur.execute('INSERT INTO news(news_url, media, category, tags, \
-                              title, description, content, first_img_url, pub_time) \
+            self.cur.execute('INSERT INTO news(news_url, media, category,\
+                              tags, title, description, content, \
+                              first_img_url, pub_time) \
                               VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s) \
                               ON CONFLICT (news_url) DO NOTHING;',
-                              (item['news_url'], item['media'], item['category'],
-                               item['tags'], item['title'], item['description'],
-                               item['content'], item['first_img_url'], item['pub_time']))
+                             (item['news_url'], item['media'],
+                              item['category'], item['tags'],
+                              item['title'], item['description'],
+                              item['content'], item['first_img_url'],
+                              item['pub_time']))
             self.connection.commit()
             return item
         except (psycopg2.errors.InFailedSqlTransaction, KeyError):
@@ -47,11 +50,13 @@ class PostgreSQLPipeline:
             self.connection.close()
             self.connection = psycopg2.connect(
                 host=self.hostname, port=self.port,
-                user=self.username, password=self.password, dbname=self.database)
+                user=self.username, password=self.password,
+                dbname=self.database)
             self.cur = self.connection.cursor()
 
             with open('insert_error.json', 'ab', encoding='utf-8') as file:
-                JsonItemExporter(file, encoding="utf-8", ensure_ascii=False).export_item(item)
+                JsonItemExporter(file, encoding="utf-8",
+                                 ensure_ascii=False).export_item(item)
                 file.close()
         return item
 
@@ -71,9 +76,9 @@ class ArticleType(Document):
     '''
     Define the article type
     '''
-    title = Text(analyzer = "ik_max_word")
-    tags = Text(analyzer = "ik_max_word")
-    content = Text(analyzer = "ik_max_word")
+    title = Text(analyzer="ik_max_word")
+    tags = Text(analyzer="ik_max_word")
+    content = Text(analyzer="ik_max_word")
     first_img_url = Keyword()
     news_url = Keyword()
     front_image_path = Keyword()
@@ -92,7 +97,7 @@ class ElasticsearchPipeline:
         '''
         Export item into ES
         '''
-        article = ArticleType(meta={'id':item_json['news_url']})
+        article = ArticleType(meta={'id': item_json['news_url']})
         article.title = item_json['title']
         article.create_date = item_json['pub_time']
         article.news_url = item_json['news_url']
@@ -100,4 +105,3 @@ class ElasticsearchPipeline:
         article.content = item_json['content']
         article.tags = item_json['tags']
         article.save()
-        

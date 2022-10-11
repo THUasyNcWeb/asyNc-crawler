@@ -61,12 +61,16 @@ class TencentNewsHomePageDownloaderMiddleware:
                     By.XPATH, '//*[@class="item cf itme-ls"]'))
                 while last_num <= img_num:
                     action_chains.move_to_element(driver.find_element(
-                        'xpath', f'//*[@class="item cf itme-ls"][{last_num}]')).perform()
+                        'xpath',
+                        f'//*[@class="item cf itme-ls"][{last_num}]')
+                    ).perform()
                     wdw(driver, 5).until(EC.visibility_of_all_elements_located(
-                        (By.XPATH, f'//*[@class="item cf itme-ls"][{last_num}]/a/img')))
+                        (By.XPATH,
+                         f'//*[@class="item cf itme-ls"][{last_num}]/a/img')))
                     last_num += 1
             response = scrapy.http.HtmlResponse(
-                url=request.url, body=driver.page_source, request=request, encoding='utf-8')
+                url=request.url, body=driver.page_source,
+                request=request, encoding='utf-8')
 
         driver.quit()
 
