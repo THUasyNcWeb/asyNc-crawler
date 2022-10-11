@@ -1,23 +1,33 @@
+"""
+This module define the NewsCrawlerItem
+"""
+
 import scrapy
 from scrapy.loader import ItemLoader
-from itemloaders.processors import Join, MapCompose, TakeFirst, Identity
-from datetime import datetime
-from elasticsearch_dsl import Document, Date, Integer, Keyword, Text, connections
+from itemloaders.processors import Join, Identity
 
-connections.create_connection(hosts=["localhost"])
 
-class TakeFirstAnything:
-    def __call__(self, values):
-        for value in values:
-            if value is not None:
-                return value
+def take_first_anything(values):
+    """
+    Get the first element if not NULL
+    """
+    for value in values:
+        if value is not None:
+            return value
+    return None
 
 
 class NewsCrawlerItemLoader(ItemLoader):
-    default_output_processor = TakeFirstAnything()
+    """
+    Define the ItemLoader with default output processor
+    """
+    default_output_processor = take_first_anything
 
 
 class NewsCrawlerItem(scrapy.Item):
+    """
+    Define every field of NewsCrawlerItem
+    """
     news_url = scrapy.Field()
     category = scrapy.Field(
         output_processor=Identity()
@@ -33,19 +43,3 @@ class NewsCrawlerItem(scrapy.Item):
     )
     first_img_url = scrapy.Field()
     pub_time = scrapy.Field()
-
-class ArticleType(Document):
-    title = Text(analyzer = "ik_max_word")
-    tags = Text(analyzer = "ik_max_word")
-    content = Text(analyzer = "ik_max_word")
-    
-    
-    first_img_url = Keyword()
-    news_url = Keyword()
-    front_image_path = Keyword()
-    media = Keyword()
-    
-    create_date = Date()
-    
-    class Index:
-        name = "tencent_news"

@@ -2,9 +2,9 @@
 Scrapy pipelines
 '''
 
+import json
 from scrapy.exporters import JsonItemExporter
 import psycopg2
-import json
 from elasticsearch_dsl import Document, Date, Keyword, Text, connections
 
 
@@ -12,12 +12,12 @@ class PostgreSQLPipeline:
     '''
     The pipeline that exports item into database
     '''
-    def open_spider(self, spider):
+    def __init__(self) -> None:
         '''
         Connect to the database
         '''
-        with open('../config/config.json', 'r') as f:
-            config = json.load(f)
+        with open('../config/config.json', 'r', encoding='utf-8') as file:
+            config = json.load(file)
         self.hostname = config['hostname']
         self.port = config['port']
         self.username = config['username']
@@ -28,7 +28,7 @@ class PostgreSQLPipeline:
             password=self.password, dbname=self.database)
         self.cur = self.connection.cursor()
 
-    def process_item(self, item, spider):
+    def process_item(self, item, _spider):
         '''
         Insert the item into the database
         '''
@@ -42,7 +42,7 @@ class PostgreSQLPipeline:
                                item['content'], item['first_img_url'], item['pub_time']))
             self.connection.commit()
             return item
-        except:
+        except (psycopg2.errors.InFailedSqlTransaction, KeyError):
             self.cur.close()
             self.connection.close()
             self.connection = psycopg2.connect(
@@ -50,12 +50,12 @@ class PostgreSQLPipeline:
                 user=self.username, password=self.password, dbname=self.database)
             self.cur = self.connection.cursor()
 
-            file = open('insert_error.json', 'ab')
-            JsonItemExporter(file, encoding="utf-8", ensure_ascii=False).export_item(item)
-            file.close()
+            with open('insert_error.json', 'ab', encoding='utf-8') as file:
+                JsonItemExporter(file, encoding="utf-8", ensure_ascii=False).export_item(item)
+                file.close()
         return item
 
-    def close_spider(self, spider):
+    def close_spider(self, _spider):
         '''
         Close the connection with the database
         '''
@@ -88,7 +88,7 @@ class ElasticsearchPipeline:
     '''
     The pipeline that export item into ES
     '''
-    def process_item(self,item_json):
+    def process_item(self, item_json):
         '''
         Export item into ES
         '''

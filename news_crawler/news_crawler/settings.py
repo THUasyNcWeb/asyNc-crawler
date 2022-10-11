@@ -1,3 +1,6 @@
+'''
+Settings for scrapy
+'''
 # Scrapy settings for news_crawler project
 #
 # For simplicity, this file contains only settings considered important or
@@ -17,7 +20,7 @@ NEWSPIDER_MODULE = 'news_crawler.spiders'
 #USER_AGENT = 'news_crawler (+http://www.yourdomain.com)'
 
 # Obey robots.txt rules
-ROBOTSTXT_OBEY = True
+ROBOTSTXT_OBEY = False
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 #CONCURRENT_REQUESTS = 32
@@ -80,7 +83,6 @@ ITEM_PIPELINES = {
 #AUTOTHROTTLE_DEBUG = False
 
 # Enable and configure HTTP caching (disabled by default)
-# See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html#httpcache-middleware-settings
 #HTTPCACHE_ENABLED = True
 #HTTPCACHE_EXPIRATION_SECS = 0
 #HTTPCACHE_DIR = 'httpcache'
