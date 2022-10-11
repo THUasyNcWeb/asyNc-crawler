@@ -2,7 +2,7 @@ from tkinter import INSERT
 from scrapy.exporters import JsonItemExporter
 import psycopg2
 import json
-
+from items import ArticleType
 
 class JsonExporterPipleline(object):
     def __init__(self):
@@ -58,3 +58,16 @@ class PostgreSQLPipline(object):
         if self.connection:
             self.cur.close()
             self.connection.close()
+
+class ElasticsearchPipeline(object):
+    
+    def process_item(self,item_json):
+        article = ArticleType(meta={'id':item_json['news_url']})
+        article.title = item_json['title']
+        article.create_date = item_json['pub_time']
+        article.news_url = item_json['news_url']
+        article.first_img_url = item_json['first_img_url'] 
+        article.content = item_json['content']
+        article.tags = item_json['tags']
+        article.save()
+        
