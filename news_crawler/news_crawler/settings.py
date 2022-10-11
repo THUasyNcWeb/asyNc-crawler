@@ -51,7 +51,7 @@ COOKIES_ENABLED = False
 # Enable or disable downloader middlewares
 # See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 DOWNLOADER_MIDDLEWARES = {
-   'news_crawler.middlewares.QqHomePageDownloaderMiddleware': 543,
+   'news_crawler.middlewares.TencentNewsHomePageDownloaderMiddleware': 543,
 }
 
 # Enable or disable extensions
@@ -63,8 +63,7 @@ DOWNLOADER_MIDDLEWARES = {
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-   'news_crawler.pipelines.JsonExporterPipleline': 300,
-   'news_crawler.pipelines.PostgreSQLPipline': 200,
+   'news_crawler.pipelines.PostgreSQLPipeline': 200,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
