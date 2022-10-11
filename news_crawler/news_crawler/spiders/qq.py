@@ -88,7 +88,7 @@ class QqAllQuantitySpider(scrapy.Spider):
         self.legal_first = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
 
     def start_requests(self):
-        for date in (self.begin_date, self.end_date + 1):
+        for date in range(self.begin_date, self.end_date + 1):
             for i in self.legal_first:
                 for j in self.legal:
                     for k in self.legal:
