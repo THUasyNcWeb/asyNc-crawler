@@ -1,2 +1,2 @@
 cd news_crawler
-scrapy crawl QqAllQuantity
+scrapy crawl TencentNewsAllQuantity 
