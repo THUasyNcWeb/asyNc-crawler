@@ -44,7 +44,7 @@ style-test:
   script:
     - pycodestyle news_crawler/news_crawler
     - PYCODESTYLE_RET=$?
-    - pylint news_crawler/news_crawler
+    - pylint --ignored-modules=psycopg2.errors news_crawler/news_crawler
     - PYLINT_RET=$?
     - if [ $PYCODESTYLE_RET \> 0 ]; then exit $PYCODESTYLE_RET; fi;
     - exit $PYLINT_RET
