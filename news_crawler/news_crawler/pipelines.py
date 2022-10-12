@@ -85,23 +85,42 @@ class ArticleType(Document):
     media = Keyword()
     create_date = Date()
 
+    def get_url(self):
+        """
+        return article's url
+        """
+        return  self.news_url
+    def get_content(self):
+        """
+        return content
+        """
+        return self.content
     class Index:
+        """
+        Index to connect
+        """
         name = "tencent_news"
+        def get_index(self):
+            """
+            return index's name
+            """
+            return self.name
+        def set_index(self,index_name):
+            """
+            set index
+            """
+            self.name = index_name
 
 
-class ElasticsearchPipeline:
-    '''
-    The pipeline that export item into ES
-    '''
-    def process_item(self, item_json):
-        '''
-        Export item into ES
-        '''
-        article = ArticleType(meta={'id': item_json['news_url']})
-        article.title = item_json['title']
-        article.create_date = item_json['pub_time']
-        article.news_url = item_json['news_url']
-        article.first_img_url = item_json['first_img_url']
-        article.content = item_json['content']
-        article.tags = item_json['tags']
-        article.save()
+def write_to_es(item_json):
+    """
+    Export item_json into Elasticsearh
+    """
+    article = ArticleType(meta={'id': item_json['news_url']})
+    article.title = item_json['title']
+    article.create_date = item_json['pub_time']
+    article.news_url = item_json['news_url']
+    article.first_img_url = item_json['first_img_url']
+    article.content = item_json['content']
+    article.tags = item_json['tags']
+    article.save()
