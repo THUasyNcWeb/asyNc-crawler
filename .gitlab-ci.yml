@@ -26,10 +26,10 @@ unit-test:
     - touch xunit-reports/xunit-result.xml
     - cd news_crawler
     - coverage run --source news_crawler -m xmlrunner --output-file ../xunit-reports/xunit-result.xml
-    - cd ..
     - ret=$?
-    - coverage xml -o coverage-reports/coverage.xml
+    - coverage xml -o ../coverage-reports/coverage.xml
     - coverage report
+    - cd ..
     - exit $ret
   after_script:
     - SUFFIX=$RANDOM
