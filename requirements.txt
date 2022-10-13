@@ -1,7 +1,8 @@
 psycopg2
-scrapy==2.5.1
+Scrapy==2.5.1
 selenium
 lxml
 webdriver_manager
 elasticsearch_dsl
 scrapy-testmaster
+pyOpenSSL==22.0.0
