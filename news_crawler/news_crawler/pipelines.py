@@ -3,6 +3,7 @@ Scrapy pipelines
 '''
 
 import json
+import logging
 from scrapy.exporters import JsonItemExporter
 import psycopg2
 from elasticsearch_dsl import Document, Date, Keyword, Text, connections
@@ -12,6 +13,7 @@ class PostgreSQLPipeline:
     '''
     The pipeline that exports item into database
     '''
+
     def __init__(self) -> None:
         '''
         Connect to the database
@@ -53,6 +55,14 @@ class PostgreSQLPipeline:
                 user=self.username, password=self.password,
                 dbname=self.database)
             self.cur = self.connection.cursor()
+            logging.warning(
+                'Error Insertion:\nnews_url: %s\nmedia: %s\n\
+                 category: %s\ntags: %s\ntitle: %s\n\
+                 description: %s\ncontent: %s\n\
+                 first_img_url: %s\npub_time: %s',
+                item['news_url'], item['media'], item['category'],
+                item['tags'], item['title'], item['description'],
+                item['content'], item['first_img_url'], item['pub_time'])
 
             with open('insert_error.json', 'ab', encoding='utf-8') as file:
                 JsonItemExporter(file, encoding="utf-8",
@@ -85,23 +95,46 @@ class ArticleType(Document):
     media = Keyword()
     create_date = Date()
 
+    def get_url(self):
+        """
+        return article's url
+        """
+        return self.news_url
+
+    def get_content(self):
+        """
+        return content
+        """
+        return self.content
+
     class Index:
+        """
+        Index to connect
+        """
         name = "tencent_news"
 
+        def get_index(self):
+            """
+            return index's name
+            """
+            return self.name
 
-class ElasticsearchPipeline:
-    '''
-    The pipeline that export item into ES
-    '''
-    def process_item(self, item_json):
-        '''
-        Export item into ES
-        '''
-        article = ArticleType(meta={'id': item_json['news_url']})
-        article.title = item_json['title']
-        article.create_date = item_json['pub_time']
-        article.news_url = item_json['news_url']
-        article.first_img_url = item_json['first_img_url']
-        article.content = item_json['content']
-        article.tags = item_json['tags']
-        article.save()
+        def set_index(self, index_name):
+            """
+            set index
+            """
+            self.name = index_name
+
+
+def write_to_es(item_json):
+    """
+    Export item_json into Elasticsearh
+    """
+    article = ArticleType(meta={'id': item_json['news_url']})
+    article.title = item_json['title']
+    article.create_date = item_json['pub_time']
+    article.news_url = item_json['news_url']
+    article.first_img_url = item_json['first_img_url']
+    article.content = item_json['content']
+    article.tags = item_json['tags']
+    article.save()
