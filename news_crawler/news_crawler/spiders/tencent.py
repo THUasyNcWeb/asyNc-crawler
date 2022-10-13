@@ -123,6 +123,7 @@ class TencentNewsAllQuantitySpider(scrapy.Spider):
         '''
         Parse legal url
         '''
-        if response.status == 200 and response.url != 'https://www.qq.com/?pgv_ref=404':
+        if response.status == 200 and \
+           response.url != 'https://www.qq.com/?pgv_ref=404':
             item_loader = parse_detail_to_item_loader(response)
             yield item_loader.load_item()
