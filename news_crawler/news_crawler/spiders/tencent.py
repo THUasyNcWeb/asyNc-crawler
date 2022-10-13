@@ -9,7 +9,7 @@ from scrapy.http import Request
 from news_crawler.items import NewsCrawlerItem, NewsCrawlerItemLoader
 
 
-def parse_tencent_news(response):
+def parse_detail_to_item_loader(response):
     '''
     parse single news item
     '''
@@ -27,6 +27,7 @@ def parse_tencent_news(response):
         item_loader.add_value('tags', tag)
     item_loader.add_xpath('title', '/html/head/title/text()')
     item_loader.add_xpath('description', '/html/head/meta[2]/@content')
+    item_loader.add_value('description', '')
     item_loader.add_xpath(
         'first_img_url', '//img[@class="content-picture"]/@src')
     item_loader.add_value('first_img_url', '')
@@ -39,7 +40,7 @@ def parse_tencent_news(response):
     for para in paras:
         item_loader.add_value('content', para)
 
-    yield item_loader.load_item()
+    return item_loader
 
 
 class TencentNewsHomePageSpider(scrapy.Spider):
@@ -67,7 +68,15 @@ class TencentNewsHomePageSpider(scrapy.Spider):
             image_url = news_node.xpath('./a/img/@src').get()
             news_url = news_node.xpath('./div/h3/a/@href').get()
             yield Request(url=news_url, meta={"image_url": image_url},
-                          callback=parse_tencent_news)
+                          callback=self.parse_tencent_news)
+
+    def parse_tencent_news(self, response):
+        '''
+        parse single news item
+        '''
+        item_loader = parse_detail_to_item_loader(response)
+
+        yield item_loader.load_item()
 
 
 class TencentNewsAllQuantitySpider(scrapy.Spider):
@@ -76,6 +85,7 @@ class TencentNewsAllQuantitySpider(scrapy.Spider):
     '''
     name = 'TencentNewsAllQuantity'
     allowed_domains = ['new.qq.com']
+    start_urls = []
 
     def __init__(self, *_args, **kwargs):
         '''
@@ -113,5 +123,7 @@ class TencentNewsAllQuantitySpider(scrapy.Spider):
         '''
         Parse legal url
         '''
-        if response.status == 200:
-            yield Request(url=response.url, callback=parse_tencent_news)
+        if response.status == 200 and \
+           response.url != 'https://www.qq.com/?pgv_ref=404':
+            item_loader = parse_detail_to_item_loader(response)
+            yield item_loader.load_item()

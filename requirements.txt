@@ -1,6 +1,7 @@
 psycopg2
-Scrapy
+scrapy==2.5.1
 selenium
 lxml
 webdriver_manager
 elasticsearch_dsl
+scrapy-testmaster
