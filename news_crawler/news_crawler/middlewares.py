@@ -8,7 +8,6 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait as wdw
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver import ChromeOptions
 from selenium.webdriver.chrome.service import Service as ChromeService
 from webdriver_manager.chrome import ChromeDriverManager
@@ -46,28 +45,23 @@ class TencentNewsHomePageDownloaderMiddleware:
         driver = webdriver.Chrome(service=ChromeService(
             ChromeDriverManager().install()), options=option)
 
-        
         driver.get(request.url)
+
         wdw(driver, 5).until(EC.visibility_of_element_located(
             (By.ID, 'load-more')))
-        last_num = 1
-        action_chains = ActionChains(driver)
-        while True:
-            load_more = driver.find_elements(
-                By.XPATH, '//div[@id="load-more"]/a')
-            if len(load_more) == 1:
+        while(True):
+            have_load_more = driver.find_elements(By.XPATH,
+                                             '//div[@id="load-more"]')
+            load_more = driver.find_elements(By.XPATH,
+                                             '//div[@id="load-more"]/a')
+            if len(have_load_more) == 0 or len(load_more) == 1:
                 break
-            img_num = len(driver.find_elements(
-                By.XPATH, '//*[@class="item cf itme-ls"]'))
-            while last_num <= img_num:
-                action_chains.move_to_element(driver.find_element(
-                    'xpath',
-                    f'//*[@class="item cf itme-ls"][{last_num}]')
-                ).perform()
-                wdw(driver, 5).until(EC.visibility_of_all_elements_located(
-                    (By.XPATH,
-                     f'//*[@class="item cf itme-ls"][{last_num}]/a/img')))
-                last_num += 1
+            # img_num = len(driver.find_elements(By.XPATH, 
+            #                                    '//*[@class="item cf itme-ls"]'))
+            driver.execute_script("window.scrollTo(0,document.body.scrollHeight)")
+            # wdw(driver, 5).until(EC.visibility_of_all_elements_located(
+            #     (By.XPATH, f'//*[@class="item cf itme-ls"][{img_num}]/a/img')))
+
         response = scrapy.http.HtmlResponse(
             url=request.url, body=driver.page_source,
             request=request, encoding='utf-8')
