@@ -50,7 +50,12 @@ class TencentNewsHomePageSpider(RedisSpider):
     '''
     name = 'TencentNewsHomePage'
     allowed_domains = ['news.qq.com', 'new.qq.com']
-    # start_urls = ['https://news.qq.com/']
+    # start_urls = ['https://news.qq.com/',
+    #               'https://new.qq.com/d/bj/',
+    #               'https://new.qq.com/ch/ent/',
+    #               'https://new.qq.com/ch/tech/',
+    #               'https://new.qq.com/ch/finance/',
+    #               'https://new.qq.com/ch/auto/']
     redis_key = "TencentNewsHomePage:start_urls"
 
     def __init__(self, *args, **kwargs):
@@ -63,12 +68,12 @@ class TencentNewsHomePageSpider(RedisSpider):
         '''
         Get all legal urls
         '''
-        news_nodes = response.xpath('//*[@class="item cf itme-ls"]')
-        for news_node in news_nodes:
-            image_url = news_node.xpath('./a/img/@src').get()
-            news_url = news_node.xpath('./div/h3/a/@href').get()
-            yield Request(url=news_url, meta={"image_url": image_url},
-                          callback=self.parse_tencent_news)
+        urls_candidate = response.xpath('//a/@href').extract()
+        for url_candidate in urls_candidate:
+            # https://new.qq.com/omn/20221016/20221016A068MZ00.html
+            if re.match(r'https://new.qq.com/.*?\d{8}A0[0-9A-Z]{4}00\.html', \
+                url_candidate) != None:
+                yield Request(url=url_candidate, callback=self.parse_tencent_news)
 
     def parse_tencent_news(self, response):
         '''
