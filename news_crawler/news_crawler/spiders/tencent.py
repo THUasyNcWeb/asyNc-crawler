@@ -5,6 +5,7 @@ Crawler of Tencent
 import re
 import scrapy
 from scrapy.http import Request
+from scrapy_redis.spiders import RedisSpider
 
 from news_crawler.items import NewsCrawlerItem, NewsCrawlerItemLoader
 
@@ -43,21 +44,20 @@ def parse_detail_to_item_loader(response):
     return item_loader
 
 
-class TencentNewsHomePageSpider(scrapy.Spider):
+class TencentNewsHomePageSpider(RedisSpider):
     '''
     Crawl the TencentNewsHomePage
     '''
     name = 'TencentNewsHomePage'
     allowed_domains = ['news.qq.com', 'new.qq.com']
-    start_urls = ['https://news.qq.com/']
+    # start_urls = ['https://news.qq.com/']
+    redis_key = "TencentNewsHomePage:start_urls"
 
-    def start_requests(self):
+    def __init__(self, *args, **kwargs):
         '''
-        Begin the request
+        Init the spider
         '''
-        for url in self.start_urls:
-            yield Request(url, dont_filter=True,
-                          meta={'crawler': 'TencentNewsHomePage'})
+        super(TencentNewsHomePageSpider, self).__init__(*args, **kwargs)
 
     def parse(self, response, **_kwargs):
         '''

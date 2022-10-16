@@ -46,31 +46,31 @@ class TencentNewsHomePageDownloaderMiddleware:
         driver = webdriver.Chrome(service=ChromeService(
             ChromeDriverManager().install()), options=option)
 
-        if request.url in spider.start_urls:
-            driver.get(request.url)
-            wdw(driver, 5).until(EC.visibility_of_element_located(
-                (By.ID, 'load-more')))
-            last_num = 1
-            action_chains = ActionChains(driver)
-            while True:
-                load_more = driver.find_elements(
-                    By.XPATH, '//div[@id="load-more"]/a')
-                if len(load_more) == 1:
-                    break
-                img_num = len(driver.find_elements(
-                    By.XPATH, '//*[@class="item cf itme-ls"]'))
-                while last_num <= img_num:
-                    action_chains.move_to_element(driver.find_element(
-                        'xpath',
-                        f'//*[@class="item cf itme-ls"][{last_num}]')
-                    ).perform()
-                    wdw(driver, 5).until(EC.visibility_of_all_elements_located(
-                        (By.XPATH,
-                         f'//*[@class="item cf itme-ls"][{last_num}]/a/img')))
-                    last_num += 1
-            response = scrapy.http.HtmlResponse(
-                url=request.url, body=driver.page_source,
-                request=request, encoding='utf-8')
+        
+        driver.get(request.url)
+        wdw(driver, 5).until(EC.visibility_of_element_located(
+            (By.ID, 'load-more')))
+        last_num = 1
+        action_chains = ActionChains(driver)
+        while True:
+            load_more = driver.find_elements(
+                By.XPATH, '//div[@id="load-more"]/a')
+            if len(load_more) == 1:
+                break
+            img_num = len(driver.find_elements(
+                By.XPATH, '//*[@class="item cf itme-ls"]'))
+            while last_num <= img_num:
+                action_chains.move_to_element(driver.find_element(
+                    'xpath',
+                    f'//*[@class="item cf itme-ls"][{last_num}]')
+                ).perform()
+                wdw(driver, 5).until(EC.visibility_of_all_elements_located(
+                    (By.XPATH,
+                     f'//*[@class="item cf itme-ls"][{last_num}]/a/img')))
+                last_num += 1
+        response = scrapy.http.HtmlResponse(
+            url=request.url, body=driver.page_source,
+            request=request, encoding='utf-8')
 
         driver.quit()
 
