@@ -15,7 +15,7 @@ BOT_NAME = 'news_crawler'
 SPIDER_MODULES = ['news_crawler.spiders']
 NEWSPIDER_MODULE = 'news_crawler.spiders'
 
-# LOG_LEVEL = "INFO"
+LOG_LEVEL = "INFO"
 # Crawl responsibly by identifying yourself on the user-agent
 # USER_AGENT = 'news_crawler (+http://www.yourdomain.com)'
 
@@ -93,10 +93,13 @@ ITEM_PIPELINES = {
 # HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
 
 # Enables scheduling storing requests queue in redis.
-SCHEDULER = "scrapy_redis.scheduler.Scheduler"
+SCHEDULER = "scrapy_redis_bloomfilter.scheduler.Scheduler"
 
 # Ensure all spiders share same duplicates filter through redis.
-DUPEFILTER_CLASS = "scrapy_redis.dupefilter.RFPDupeFilter"
+DUPEFILTER_CLASS = "scrapy_redis_bloomfilter.dupefilter.RFPDupeFilter"
+
+BLOOMFILTER_HASH_NUMBER = 6
+BLOOMFILTER_BIT = 10
 
 SCHEDULER_PERSIST = True
 
