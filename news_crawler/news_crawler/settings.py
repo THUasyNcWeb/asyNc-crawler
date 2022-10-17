@@ -93,15 +93,12 @@ ITEM_PIPELINES = {
 # HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
 
 # Enables scheduling storing requests queue in redis.
-SCHEDULER = "scrapy_redis_bloomfilter.scheduler.Scheduler"
+SCHEDULER = "scrapy_redis.scheduler.Scheduler"
 
 # Ensure all spiders share same duplicates filter through redis.
-DUPEFILTER_CLASS = "scrapy_redis_bloomfilter.dupefilter.RFPDupeFilter"
+DUPEFILTER_CLASS = "scrapy_redis.dupefilter.RFPDupeFilter"
 
-BLOOMFILTER_HASH_NUMBER = 6
-BLOOMFILTER_BIT = 10
-
-SCHEDULER_PERSIST = True
+SCHEDULER_PERSIST = False
 
 REDIS_HOST = 'localhost'
 REDIS_PARAMS = {
@@ -109,4 +106,3 @@ REDIS_PARAMS = {
 }
 REDIS_PORT = 6379
 SCHEDULER_QUEUE_CLASS = 'scrapy_redis.queue.PriorityQueue'
-SCHEDULER_PERSIST = False
