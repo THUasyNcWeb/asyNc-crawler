@@ -6,8 +6,10 @@ import re
 import scrapy
 from scrapy.http import Request
 from scrapy_redis.spiders import RedisSpider
+import threading
 
 from news_crawler.items import NewsCrawlerItem, NewsCrawlerItemLoader
+from news_crawler.utils.utils import tencent_news_home_page_execute
 
 
 def parse_detail_to_item_loader(response):
@@ -53,15 +55,15 @@ class TencentNewsHomePageSpider(RedisSpider):
     # start_urls = ['https://news.qq.com/',
     #               'https://new.qq.com/d/bj/',
     #               'https://new.qq.com/ch/ent/',
-    #               'https://new.qq.com/ch/tech/',
-    #               'https://new.qq.com/ch/finance/',
-    #               'https://new.qq.com/ch/auto/']
+    #               'https://new.qq.com/ch/tech/']
     redis_key = "TencentNewsHomePage:start_urls"
 
     def __init__(self, *args, **kwargs):
         '''
         Init the spider
         '''
+        self.start_urls_execute = threading.Thread(target=tencent_news_home_page_execute)
+        self.start_urls_execute.start()
         super(TencentNewsHomePageSpider, self).__init__(*args, **kwargs)
 
     def parse(self, response, **_kwargs):
@@ -71,7 +73,7 @@ class TencentNewsHomePageSpider(RedisSpider):
         urls_candidate = response.xpath('//a/@href').extract()
         for url_candidate in urls_candidate:
             # https://new.qq.com/omn/20221016/20221016A068MZ00.html
-            if re.match(r'https://new.qq.com/.*?\d{8}A0[0-9A-Z]{4}00\.html', \
+            if re.match(r'https://new.qq.com/.*?\d{8}[VA]0[0-9A-Z]{4}00\.html', \
                 url_candidate) != None:
                 yield Request(url=url_candidate, callback=self.parse_tencent_news)
 
