@@ -60,7 +60,7 @@ class TencentNewsHomePageSpider(RedisSpider):
         '''
         self.incre_timer = IncreTimer.TencentIncrementTimer()
         self.start_urls_execute = threading.Thread(
-            target=self.incre_timer.execute)
+            target=self.incre_timer.execute, daemon=True)
         self.start_urls_execute.start()
         super().__init__(*args, **kwargs)
 
