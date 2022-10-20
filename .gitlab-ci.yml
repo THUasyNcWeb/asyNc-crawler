@@ -25,7 +25,7 @@ unit-test:
     - mkdir xunit-reports
     - touch xunit-reports/xunit-result.xml
     - cd news_crawler
-    - coverage run --source news_crawler -m xmlrunner --output-file ../xunit-reports/xunit-result.xml
+    - coverage run --source news_crawler/spiders -m xmlrunner --output-file ../xunit-reports/xunit-result.xml
     - ret=$?
     - coverage xml -o ../coverage-reports/coverage.xml
     - coverage report
