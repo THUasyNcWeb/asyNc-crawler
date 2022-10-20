@@ -28,10 +28,11 @@ class TencentNewsHomePageDownloaderMiddleware:
                                 signal=signals.spider_opened)
         return spider
 
-    def process_response(self, request, response, _spider):
+    def process_response(self, request, response, spider):
         '''
         Use selenium to get all message from TencentNewsHomePage
         '''
+        del spider
         if request.meta.get("crawler") != "TencentNewsHomePage":
             return response
 

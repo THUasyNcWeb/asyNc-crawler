@@ -18,7 +18,7 @@ class TencentIncrementTimer():
         """
         Init the timer to connect with redis.
         """
-        with open('../config/config.json', 'r', encoding='utf-8') as file:
+        with open('../config/redis.json', 'r', encoding='utf-8') as file:
             config = json.load(file)
         self.host = config['host']
         self.port = config['port']
