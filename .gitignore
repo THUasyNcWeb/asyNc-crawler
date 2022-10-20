@@ -4,8 +4,7 @@ __pycache__/
 test.json
 test.ipynb
 insert_error.json
-config.json
-redis.json
+config/
 .pytest_cache
 .coverage
 xunit-reports

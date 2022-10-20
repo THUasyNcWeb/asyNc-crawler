@@ -97,10 +97,11 @@ class PostgreSQLPipeline:
             except (elasticsearch.exceptions.ConnectionError, ConnectionError):
                 print("Elasticseach not run")
 
-    def process_item(self, item, _spider):
+    def process_item(self, item, spider):
         '''
         Insert the item into the database
         '''
+        del spider
         try:
             self.cur.execute('INSERT INTO news(news_url, media, category,\
                               tags, title, description, content, \
