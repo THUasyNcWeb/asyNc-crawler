@@ -6,6 +6,7 @@ webdriver_manager
 elasticsearch_dsl
 scrapy-testmaster
 pyOpenSSL==22.0.0
+elasticsearch
 scrapy-redis
 redis
 schedule
