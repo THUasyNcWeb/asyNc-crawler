@@ -28,7 +28,7 @@ class TencentNewsHomePageDownloaderMiddleware:
                                 signal=signals.spider_opened)
         return spider
 
-    def process_response(self, request, response, spider):
+    def process_response(self, request, response, _spider):
         '''
         Use selenium to get all message from TencentNewsHomePage
         '''
@@ -58,16 +58,18 @@ class TencentNewsHomePageDownloaderMiddleware:
         load_num = 0
         last_num = 0
 
-        while(True):
+        while True:
             have_load_more = driver.find_elements(By.XPATH,
-                                             '//div[@id="load-more"]')
+                                                  '//div[@id="load-more"]')
             load_more = driver.find_elements(By.XPATH,
                                              '//div[@id="load-more"]/a')
             if len(have_load_more) == 0 or len(load_more) == 1:
                 break
-            img_num = len(driver.find_elements(By.XPATH, 
-                                               '//*[@class="item cf itme-ls"]'))
-            driver.execute_script("window.scrollTo(0,document.body.scrollHeight)")
+            img_num = driver.find_elements(By.XPATH,
+                                           '//*[@class="item cf itme-ls"]')
+            img_num = len(img_num)
+            driver.execute_script(
+                "window.scrollTo(0,document.body.scrollHeight)")
             wdw(driver, 5).until(EC.visibility_of_all_elements_located(
                 (By.XPATH, f'//*[@class="item cf itme-ls"][{img_num}]/a/img')))
             if last_num != img_num:
