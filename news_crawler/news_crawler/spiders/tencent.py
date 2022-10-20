@@ -3,11 +3,13 @@ Crawler of Tencent
 '''
 
 import re
+import threading
 import scrapy
 from scrapy.http import Request
 from scrapy_redis.spiders import RedisSpider
 
 from news_crawler.items import NewsCrawlerItem, NewsCrawlerItemLoader
+import news_crawler.utils.utils as IncreTimer
 
 
 def parse_detail_to_item_loader(response):
@@ -50,25 +52,29 @@ class TencentNewsHomePageSpider(RedisSpider):
     '''
     name = 'TencentNewsHomePage'
     allowed_domains = ['news.qq.com', 'new.qq.com']
-    # start_urls = ['https://news.qq.com/']
     redis_key = "TencentNewsHomePage:start_urls"
 
     def __init__(self, *args, **kwargs):
         '''
         Init the spider
         '''
-        super(TencentNewsHomePageSpider, self).__init__(*args, **kwargs)
+        self.incre_timer = IncreTimer.TencentIncrementTimer()
+        self.start_urls_execute = threading.Thread(
+            target=self.incre_timer.execute, daemon=True)
+        self.start_urls_execute.start()
+        super().__init__(*args, **kwargs)
 
     def parse(self, response, **_kwargs):
         '''
         Get all legal urls
         '''
-        news_nodes = response.xpath('//*[@class="item cf itme-ls"]')
-        for news_node in news_nodes:
-            image_url = news_node.xpath('./a/img/@src').get()
-            news_url = news_node.xpath('./div/h3/a/@href').get()
-            yield Request(url=news_url, meta={"image_url": image_url},
-                          callback=self.parse_tencent_news)
+        urls_candidate = response.xpath('//a/@href').extract()
+        for url_candidate in urls_candidate:
+            # https://new.qq.com/omn/20221016/20221016A068MZ00.html
+            if re.match(r'https://new.qq.com/.*?\d{8}[VA]0[0-9A-Z]{4}00\.html',
+                        url_candidate) is not None:
+                yield Request(url=url_candidate,
+                              callback=self.parse_tencent_news)
 
     def parse_tencent_news(self, response):
         '''

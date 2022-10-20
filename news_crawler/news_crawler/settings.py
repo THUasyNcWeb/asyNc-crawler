@@ -15,7 +15,7 @@ BOT_NAME = 'news_crawler'
 SPIDER_MODULES = ['news_crawler.spiders']
 NEWSPIDER_MODULE = 'news_crawler.spiders'
 
-# LOG_LEVEL = "INFO"
+LOG_LEVEL = "INFO"
 # Crawl responsibly by identifying yourself on the user-agent
 # USER_AGENT = 'news_crawler (+http://www.yourdomain.com)'
 
@@ -98,7 +98,7 @@ SCHEDULER = "scrapy_redis.scheduler.Scheduler"
 # Ensure all spiders share same duplicates filter through redis.
 DUPEFILTER_CLASS = "scrapy_redis.dupefilter.RFPDupeFilter"
 
-SCHEDULER_PERSIST = True
+SCHEDULER_PERSIST = False
 
 REDIS_HOST = 'localhost'
 REDIS_PARAMS = {
@@ -106,4 +106,3 @@ REDIS_PARAMS = {
 }
 REDIS_PORT = 6379
 SCHEDULER_QUEUE_CLASS = 'scrapy_redis.queue.PriorityQueue'
-SCHEDULER_PERSIST = False
