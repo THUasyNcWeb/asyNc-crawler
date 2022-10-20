@@ -5,7 +5,7 @@ test.json
 test.ipynb
 insert_error.json
 config.json
-
+redis.json
 .pytest_cache
 .coverage
 xunit-reports
