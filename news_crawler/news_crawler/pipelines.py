@@ -68,7 +68,7 @@ def write_to_es(item_json):
     article.save()
 
 
-class PostgreSQLPipeline:
+class SQLPipeline:
     '''
     The pipeline that exports item into database
     '''
@@ -114,7 +114,6 @@ class PostgreSQLPipeline:
                               item['content'], item['first_img_url'],
                               item['pub_time']))
             self.connection.commit()
-            return item
         except (psycopg2.errors.InFailedSqlTransaction, KeyError):
             self.cur.close()
             self.connection.close()
