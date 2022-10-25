@@ -100,9 +100,9 @@ DUPEFILTER_CLASS = "scrapy_redis.dupefilter.RFPDupeFilter"
 
 SCHEDULER_PERSIST = False
 
-REDIS_HOST = 'localhost'
+REDIS_HOST = '43.143.201.186'
 REDIS_PARAMS = {
-    'password': '123456',
+    'password': 'asyNc',
 }
 REDIS_PORT = 6379
 SCHEDULER_QUEUE_CLASS = 'scrapy_redis.queue.PriorityQueue'
