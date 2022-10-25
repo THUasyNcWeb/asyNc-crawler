@@ -3,10 +3,15 @@ Crawler of Tencent
 '''
 
 import re
+import threading
+import json
 import scrapy
+import redis
 from scrapy.http import Request
+from scrapy_redis.spiders import RedisSpider
 
 from news_crawler.items import NewsCrawlerItem, NewsCrawlerItemLoader
+import news_crawler.utils.utils as IncreTimer
 
 
 def parse_detail_to_item_loader(response):
@@ -43,32 +48,35 @@ def parse_detail_to_item_loader(response):
     return item_loader
 
 
-class TencentNewsHomePageSpider(scrapy.Spider):
+class TencentNewsHomePageSpider(RedisSpider):
     '''
     Crawl the TencentNewsHomePage
     '''
     name = 'TencentNewsHomePage'
     allowed_domains = ['news.qq.com', 'new.qq.com']
-    start_urls = ['https://news.qq.com/']
+    redis_key = "TencentNewsHomePage:start_urls"
 
-    def start_requests(self):
+    def __init__(self, *args, **kwargs):
         '''
-        Begin the request
+        Init the spider
         '''
-        for url in self.start_urls:
-            yield Request(url, dont_filter=True,
-                          meta={'crawler': 'TencentNewsHomePage'})
+        self.incre_timer = IncreTimer.TencentIncrementTimer()
+        self.start_urls_execute = threading.Thread(
+            target=self.incre_timer.execute, daemon=True)
+        self.start_urls_execute.start()
+        super().__init__(*args, **kwargs)
 
     def parse(self, response, **_kwargs):
         '''
         Get all legal urls
         '''
-        news_nodes = response.xpath('//*[@class="item cf itme-ls"]')
-        for news_node in news_nodes:
-            image_url = news_node.xpath('./a/img/@src').get()
-            news_url = news_node.xpath('./div/h3/a/@href').get()
-            yield Request(url=news_url, meta={"image_url": image_url},
-                          callback=self.parse_tencent_news)
+        urls_candidate = response.xpath('//a/@href').extract()
+        for url_candidate in urls_candidate:
+            # https://new.qq.com/omn/20221016/20221016A068MZ00.html
+            if re.match(r'https://new.qq.com/.*?\d{8}[VA]0[0-9A-Z]{4}00\.html',
+                        url_candidate) is not None:
+                yield Request(url=url_candidate,
+                              callback=self.parse_tencent_news)
 
     def parse_tencent_news(self, response):
         '''
@@ -101,11 +109,25 @@ class TencentNewsAllQuantitySpider(scrapy.Spider):
                       'U', 'V', 'W', 'X', 'Y', 'Z']
         self.legal_first = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
 
+        with open('../config/redis.json', 'r', encoding='utf-8') as file:
+            config = json.load(file)
+        host = config['host']
+        port = config['port']
+        password = config['password']
+        self.my_redis = redis.Redis(host=host,
+                                    port=port,
+                                    decode_responses=True,
+                                    password=password)
+
     def start_requests(self):
         '''
         Get all possible urls
         '''
         for date in range(self.begin_date, self.end_date + 1):
+            if self.my_redis.sismember("TencentNewsAllQuantity:dates",
+                                       date):
+                continue
+            self.my_redis.sadd("TencentNewsAllQuantity:dates", date)
             for first in self.legal_first:
                 for second in self.legal:
                     for third in self.legal:
@@ -113,11 +135,11 @@ class TencentNewsAllQuantitySpider(scrapy.Spider):
                             url = 'https://new.qq.com/rain/a/' + \
                                   str(date) + 'A0' + first + second + \
                                   third + forth + '00'
-                            yield Request(url, dont_filter=True)
+                            yield Request(url)
                             url = 'https://new.qq.com/rain/a/' + \
                                   str(date) + 'V0' + first + second + \
                                   third + forth + '00'
-                            yield Request(url, dont_filter=True)
+                            yield Request(url)
 
     def parse(self, response, **_kwargs):
         '''

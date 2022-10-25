@@ -57,7 +57,7 @@ COOKIES_ENABLED = False
 # Enable or disable downloader middlewares
 # See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 DOWNLOADER_MIDDLEWARES = {
-   'news_crawler.middlewares.TencentNewsHomePageDownloaderMiddleware': 543,
+    'news_crawler.middlewares.TencentNewsHomePageDownloaderMiddleware': 543,
 }
 
 # Enable or disable extensions
@@ -69,7 +69,7 @@ DOWNLOADER_MIDDLEWARES = {
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-   'news_crawler.pipelines.PostgreSQLPipeline': 200,
+    'news_crawler.pipelines.SQLPipeline': 200,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
@@ -91,3 +91,18 @@ ITEM_PIPELINES = {
 # HTTPCACHE_DIR = 'httpcache'
 # HTTPCACHE_IGNORE_HTTP_CODES = []
 # HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
+
+# Enables scheduling storing requests queue in redis.
+SCHEDULER = "scrapy_redis.scheduler.Scheduler"
+
+# Ensure all spiders share same duplicates filter through redis.
+DUPEFILTER_CLASS = "scrapy_redis.dupefilter.RFPDupeFilter"
+
+SCHEDULER_PERSIST = False
+
+REDIS_HOST = '43.143.201.186'
+REDIS_PARAMS = {
+    'password': 'asyNc',
+}
+REDIS_PORT = 6379
+SCHEDULER_QUEUE_CLASS = 'scrapy_redis.queue.PriorityQueue'
