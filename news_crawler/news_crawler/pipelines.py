@@ -102,18 +102,23 @@ class SQLPipeline:
         Insert the item into the database
         '''
         del spider
+        dul_tag = True
         try:
-            self.cur.execute('INSERT INTO news(news_url, media, category,\
-                              tags, title, description, content, \
-                              first_img_url, pub_time) \
-                              VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s) \
-                              ON CONFLICT (news_url) DO NOTHING;',
-                             (item['news_url'], item['media'],
-                              item['category'], item['tags'],
-                              item['title'], item['description'],
-                              item['content'], item['first_img_url'],
-                              item['pub_time']))
-            self.connection.commit()
+            self.cur.execute('select * from news where news_url=%s',
+                             (item['news_url'],))
+            if len(self.cur.fetchall()) == 0:
+                dul_tag = False
+                self.cur.execute('INSERT INTO news(news_url, media, category,\
+                                  tags, title, description, content, \
+                                  first_img_url, pub_time) \
+                                  VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)\
+                                  ON CONFLICT (news_url) DO NOTHING;',
+                                 (item['news_url'], item['media'],
+                                  item['category'], item['tags'],
+                                  item['title'], item['description'],
+                                  item['content'], item['first_img_url'],
+                                  item['pub_time']))
+                self.connection.commit()
         except (psycopg2.errors.InFailedSqlTransaction, KeyError):
             self.cur.close()
             self.connection.close()
@@ -136,7 +141,8 @@ class SQLPipeline:
                                  ensure_ascii=False).export_item(item)
                 file.close()
         try:
-            write_to_es(item)
+            if dul_tag:
+                write_to_es(item)
         except (elasticsearch.exceptions.ConnectionError, ConnectionError):
             print("Elasticseach not run")
         return item
