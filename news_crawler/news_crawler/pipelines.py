@@ -4,7 +4,6 @@ Scrapy pipelines
 
 import json
 import logging
-from unicodedata import category
 from scrapy.exporters import JsonItemExporter
 import psycopg2
 from elasticsearch_dsl import Document, Date, Keyword, Text, connections
@@ -15,9 +14,9 @@ class ArticleType(Document):
     '''
     Define the article type
     '''
-    title = Text(analyzer = "ik_max_word",search_analyzer="ik_smart")
-    tags = Text(analyzer = "ik_max_word",search_analyzer="ik_smart")
-    content = Text(analyzer = "ik_max_word",search_analyzer="ik_smart")
+    title = Text(analyzer = "ik_max_word", search_analyzer="ik_smart")
+    tags = Text(analyzer = "ik_max_word", search_analyzer="ik_smart")
+    content = Text(analyzer = "ik_max_word", search_analyzer="ik_smart")
     category = Keyword()
     first_img_url = Keyword()
     news_url = Keyword()
