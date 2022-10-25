@@ -119,11 +119,11 @@ class TencentNewsAllQuantitySpider(scrapy.Spider):
                             url = 'https://new.qq.com/rain/a/' + \
                                   str(date) + 'A0' + first + second + \
                                   third + forth + '00'
-                            yield Request(url, dont_filter=True)
+                            yield Request(url)
                             url = 'https://new.qq.com/rain/a/' + \
                                   str(date) + 'V0' + first + second + \
                                   third + forth + '00'
-                            yield Request(url, dont_filter=True)
+                            yield Request(url)
 
     def parse(self, response, **_kwargs):
         '''

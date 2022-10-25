@@ -69,7 +69,7 @@ DOWNLOADER_MIDDLEWARES = {
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-    'news_crawler.pipelines.PostgreSQLPipeline': 200,
+    'news_crawler.pipelines.SQLPipeline': 200,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
