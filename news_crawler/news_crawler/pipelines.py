@@ -143,7 +143,7 @@ class SQLPipeline:
                                  ensure_ascii=False).export_item(item)
                 file.close()
         try:
-            if dul_tag:
+            if not dul_tag:
                 write_to_es(item)
         except (elasticsearch.exceptions.ConnectionError, ConnectionError):
             print("Elasticseach not run")
