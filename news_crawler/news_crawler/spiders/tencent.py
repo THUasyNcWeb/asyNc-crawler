@@ -4,7 +4,9 @@ Crawler of Tencent
 
 import re
 import threading
+import json
 import scrapy
+import redis
 from scrapy.http import Request
 from scrapy_redis.spiders import RedisSpider
 
@@ -107,11 +109,25 @@ class TencentNewsAllQuantitySpider(scrapy.Spider):
                       'U', 'V', 'W', 'X', 'Y', 'Z']
         self.legal_first = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
 
+        with open('../config/redis.json', 'r', encoding='utf-8') as file:
+            config = json.load(file)
+        host = config['host']
+        port = config['port']
+        password = config['password']
+        self.my_redis = redis.Redis(host=host,
+                                    port=port,
+                                    decode_responses=True,
+                                    password=password)
+
     def start_requests(self):
         '''
         Get all possible urls
         '''
         for date in range(self.begin_date, self.end_date + 1):
+            if self.my_redis.sismember("TencentNewsAllQuantity:dates",
+                                       date):
+                continue
+            self.my_redis.sadd("TencentNewsAllQuantity:dates", date)
             for first in self.legal_first:
                 for second in self.legal:
                     for third in self.legal:
