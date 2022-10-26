@@ -114,14 +114,18 @@ class SQLPipeline:
             self.cur.execute(query, (item['news_url'],))
             if len(self.cur.fetchall()) == 0:
                 dul_tag = False
-        except (psycopg2.errors.InFailedSqlTransaction, KeyError):
+        except (psycopg2.errors.InFailedSqlTransaction,
+                psycopg2.OperationalError):
             self.cur.close()
             self.connection.close()
-            self.connection = psycopg2.connect(
-                host=self.postgres[0], port=self.postgres[1],
-                user=self.postgres[2], password=self.postgres[3],
-                dbname=self.postgres[4])
-            self.cur = self.connection.cursor()
+            try:
+                self.connection = psycopg2.connect(
+                    host=self.postgres[0], port=self.postgres[1],
+                    user=self.postgres[2], password=self.postgres[3],
+                    dbname=self.postgres[4])
+                self.cur = self.connection.cursor()
+            except psycopg2.OperationalError:
+                pass
 
         try:
             if not dul_tag and item['first_img_url'] != '':
@@ -153,14 +157,19 @@ class SQLPipeline:
                                          item['first_img_url'],
                                          item['pub_time']))
                 self.connection.commit()
-        except (psycopg2.errors.InFailedSqlTransaction, KeyError):
+        except (psycopg2.errors.InFailedSqlTransaction,
+                psycopg2.OperationalError,
+                KeyError):
             self.cur.close()
             self.connection.close()
-            self.connection = psycopg2.connect(
-                host=self.postgres[0], port=self.postgres[1],
-                user=self.postgres[2], password=self.postgres[3],
-                dbname=self.postgres[4])
-            self.cur = self.connection.cursor()
+            try:
+                self.connection = psycopg2.connect(
+                    host=self.postgres[0], port=self.postgres[1],
+                    user=self.postgres[2], password=self.postgres[3],
+                    dbname=self.postgres[4])
+                self.cur = self.connection.cursor()
+            except psycopg2.OperationalError:
+                pass
             logging.warning(
                 'Error Insertion:\nnews_url: %s\nmedia: %s\n\
                  category: %s\ntags: %s\ntitle: %s\n\
