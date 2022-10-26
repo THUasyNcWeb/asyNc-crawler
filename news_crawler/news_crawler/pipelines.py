@@ -16,6 +16,7 @@ class ArticleType(Document):
     '''
     title = Text(analyzer="ik_max_word", search_analyzer="ik_smart")
     content = Text(analyzer="ik_max_word", search_analyzer="ik_smart")
+    tags = Text(analyzer="ik_max_word", search_analyzer="ik_smart")
     first_img_url = Keyword()
     news_url = Keyword()
     front_image_path = Keyword()
@@ -64,6 +65,7 @@ def write_to_es(item_json):
     article.first_img_url = item_json['first_img_url']
     article.content = item_json['content']
     article.media = item_json['media']
+    article.tags = item_json['tags']
     article.save()
 
 
