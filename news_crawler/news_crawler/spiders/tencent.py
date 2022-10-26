@@ -60,6 +60,7 @@ class TencentNewsHomePageSpider(RedisSpider):
         '''
         Init the spider
         '''
+        self.data_table = kwargs.get('data_table')
         self.incre_timer = IncreTimer.TencentIncrementTimer()
         self.start_urls_execute = threading.Thread(
             target=self.incre_timer.execute, daemon=True)
@@ -100,6 +101,7 @@ class TencentNewsAllQuantitySpider(scrapy.Spider):
         Init the legal characters
         '''
         super().__init__()
+        self.data_table = kwargs.get('data_table')
         self.begin_date = int(kwargs.get('begin_date', '20221008'))
         self.end_date = int(kwargs.get('end_date', '20221008'))
         self.legal = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
@@ -108,6 +110,10 @@ class TencentNewsAllQuantitySpider(scrapy.Spider):
                       'O', 'P', 'Q', 'R', 'S', 'T',
                       'U', 'V', 'W', 'X', 'Y', 'Z']
         self.legal_first = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+        self.legal_date = ((101, 131), (201, 228), (301, 331),
+                           (401, 430), (501, 531), (601, 630),
+                           (701, 731), (801, 831), (901, 930),
+                           (1001, 1031), (1101, 1130), (1201, 1231))
 
         with open('../config/redis.json', 'r', encoding='utf-8') as file:
             config = json.load(file)
@@ -124,6 +130,15 @@ class TencentNewsAllQuantitySpider(scrapy.Spider):
         Get all possible urls
         '''
         for date in range(self.begin_date, self.end_date + 1):
+            month_day = date % 10000
+            month_day_legal = False
+            for month in self.legal_date:
+                if month[0] <= month_day <= month[1]:
+                    month_day_legal = True
+                    break
+            if not month_day_legal:
+                continue
+
             if self.my_redis.sismember("TencentNewsAllQuantity:dates",
                                        date):
                 continue
