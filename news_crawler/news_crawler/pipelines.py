@@ -4,6 +4,8 @@ Scrapy pipelines
 
 import json
 import logging
+import hashlib
+import urllib.request
 from scrapy.exporters import JsonItemExporter
 import psycopg2
 from elasticsearch_dsl import Document, Date, Keyword, Text, connections
@@ -80,15 +82,19 @@ class SQLPipeline:
         '''
         with open('../config/config.json', 'r', encoding='utf-8') as file:
             config = json.load(file)
-        self.hostname = config['hostname']
-        self.port = config['port']
-        self.username = config['username']
-        self.password = config['password']
-        self.database = config['database']
+        self.postgres = (config['hostname'], config['port'],
+                         config['username'], config['password'],
+                         config['database'])
         self.connection = psycopg2.connect(
-            host=self.hostname, port=self.port, user=self.username,
-            password=self.password, dbname=self.database)
+            host=self.postgres[0], port=self.postgres[1],
+            user=self.postgres[2], password=self.postgres[3],
+            dbname=self.postgres[4])
         self.cur = self.connection.cursor()
+
+        with open('../config/image_path.json', 'r', encoding='utf-8') as file:
+            config = json.load(file)
+        self.image_download_path = config['path']
+        self.image_prefix = config['prefix']
 
         with open('../config/es.json', 'r', encoding='utf-8') as file:
             es_config = json.load(file)
@@ -108,6 +114,33 @@ class SQLPipeline:
             self.cur.execute(query, (item['news_url'],))
             if len(self.cur.fetchall()) == 0:
                 dul_tag = False
+        except (psycopg2.errors.InFailedSqlTransaction, KeyError):
+            self.cur.close()
+            self.connection.close()
+            self.connection = psycopg2.connect(
+                host=self.postgres[0], port=self.postgres[1],
+                user=self.postgres[2], password=self.postgres[3],
+                dbname=self.postgres[4])
+            self.cur = self.connection.cursor()
+
+        try:
+            if not dul_tag and item['first_img_url'] != '':
+                img_url = item['first_img_url'].strip()
+                md5 = hashlib.md5(img_url.encode(encoding='UTF-8')) \
+                             .hexdigest()
+                item['first_img_url'] = 'https:' + \
+                                        item['first_img_url']
+                filepath = self.image_download_path + md5 + '.jpg'
+                urllib.request.urlretrieve(
+                    item['first_img_url'], filename=filepath)
+                item['first_img_url'] = self.image_prefix + \
+                    md5 + '.jpg'
+        except urllib.error.URLError:
+            print("Error occurred when downloading file, error message:")
+            print('urllib.error.URLError')
+
+        try:
+            if not dul_tag:
                 query = f'INSERT INTO {spider.data_table}(news_url, media, \
                           category, tags, title, description, content, \
                           first_img_url, pub_time) \
@@ -124,9 +157,9 @@ class SQLPipeline:
             self.cur.close()
             self.connection.close()
             self.connection = psycopg2.connect(
-                host=self.hostname, port=self.port,
-                user=self.username, password=self.password,
-                dbname=self.database)
+                host=self.postgres[0], port=self.postgres[1],
+                user=self.postgres[2], password=self.postgres[3],
+                dbname=self.postgres[4])
             self.cur = self.connection.cursor()
             logging.warning(
                 'Error Insertion:\nnews_url: %s\nmedia: %s\n\
