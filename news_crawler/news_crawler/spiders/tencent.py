@@ -26,7 +26,7 @@ def parse_detail_to_item_loader(response):
         '/html/head/script[7]/text()').extract_first()
     item_loader.add_value('media', re.findall(
         r'"media": "(.*?)"', window_data)[0])
-    for catalog in re.findall(r'"catalog\d+": "(.*?)"', window_data):
+    for catalog in re.findall(r'"catalog1": "(.*?)"', window_data):
         item_loader.add_value('category', catalog)
     for tag in re.findall(r'"tags": "(.*?)"', window_data)[0].split(','):
         item_loader.add_value('tags', tag)
