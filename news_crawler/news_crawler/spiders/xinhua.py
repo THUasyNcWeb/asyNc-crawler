@@ -53,6 +53,49 @@ def parse_xinhua_to_item_loader(response):
     return item_loader
 
 
+class XinhuaNewsIncreSpider(RedisSpider):
+    '''
+    Crawl the XinhuaNewsIncre
+    '''
+    name = 'XinhuaNewsIncre'
+    redis_key = "XinhuaNewsIncre:start_urls"
+
+    def __init__(self, *args, **kwargs):
+        '''
+        Init the spider
+        '''
+        self.data_table = kwargs.get('data_table', 'news')
+        self.attribution = kwargs.get('attribution', 'minor')
+        if self.attribution == 'main':
+            incre_timer = IncreTimer.TencentIncrementTimer('xinhua_news',
+                                                 'XinhuaNewsIncre:start_urls')
+            start_urls_execute = threading.Thread(
+                target=incre_timer.execute, daemon=True)
+            start_urls_execute.start()
+        super().__init__(*args, **kwargs)
+
+    def parse(self, response, **_kwargs):
+        '''
+        Get all legal urls
+        '''
+        logging.info('Find news_url from %s', response.url)
+        urls_candidate = re.findall(r'"url":"(.*?)"', response.text)
+        for url_candidate in urls_candidate:
+            if re.match(r'https://new.qq.com/.*?\d{8}[VA]0[0-9A-Z]{4}00',
+                        url_candidate) is not None:
+                logging.info('Crawl the %s', url_candidate)
+                yield Request(url=url_candidate,
+                              callback=self.parse_tencent_news)
+
+    def parse_tencent_news(self, response):
+        '''
+        parse single news item
+        '''
+        item_loader = parse_xinhua_to_item_loader(response)
+
+        yield item_loader.load_item()
+
+
 class XinhuaNewsAllQuantitySpider(scrapy.Spider):
     '''
     Crawl the XinhuaNews with all quantity
