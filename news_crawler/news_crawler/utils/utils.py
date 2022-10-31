@@ -6,7 +6,6 @@ import time
 import json
 import logging
 import redis
-import schedule
 
 
 class TencentIncrementTimer():
@@ -20,13 +19,13 @@ class TencentIncrementTimer():
         """
         with open('../config/redis.json', 'r', encoding='utf-8') as file:
             config = json.load(file)
-        self.host = config['host']
-        self.port = config['port']
-        self.password = config['password']
-        self.my_redis = redis.Redis(host=self.host,
-                                    port=self.port,
+        host = config['host']
+        port = config['port']
+        password = config['password']
+        self.my_redis = redis.Redis(host=host,
+                                    port=port,
                                     decode_responses=True,
-                                    password=self.password)
+                                    password=password)
         with open('./url.json', 'r', encoding='utf-8') as file:
             urls = json.load(file)
         self.start_urls = urls['tencent_news']
@@ -36,10 +35,11 @@ class TencentIncrementTimer():
         Trigger timer.
         """
         self.add_job()
-        schedule.every(1).seconds.do(self.add_job)
         while True:
-            schedule.run_pending()
-            time.sleep(0.5)
+            if len(self.my_redis.lrange('TencentNewsIncre:start_urls', 0, 1)) \
+                    == 0:
+                self.add_job()
+            time.sleep(1)
 
     def add_job(self):
         """
