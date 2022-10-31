@@ -30,7 +30,7 @@ def parse_detail_to_item_loader(response):
         item_loader.add_value('category', catalog)
     for tag in re.findall(r'"tags": "(.*?)"', window_data)[0].split(','):
         item_loader.add_value('tags', tag)
-    for title in re.findall(r'"title": "(.*?)"'):
+    for title in re.findall(r'"title": "(.*?)"', window_data):
         item_loader.add_value('title', title)
     item_loader.add_xpath('description', '/html/head/meta[2]/@content')
     item_loader.add_value('description', '')
@@ -74,7 +74,7 @@ class TencentNewsIncreSpider(RedisSpider):
         '''
         Get all legal urls
         '''
-        urls_candidate = re.findall(r'"url":"(.*?)"',response.text)
+        urls_candidate = re.findall(r'"url":"(.*?)"', response.text)
         for url_candidate in urls_candidate:
             if re.match(r'https://new.qq.com/.*?\d{8}[VA]0[0-9A-Z]{4}00\.html',
                         url_candidate) is not None:
