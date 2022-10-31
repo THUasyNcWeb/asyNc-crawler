@@ -79,15 +79,15 @@ class XinhuaNewsIncreSpider(RedisSpider):
         Get all legal urls
         '''
         logging.info('Find news_url from %s', response.url)
-        urls_candidate = re.findall(r'"url":"(.*?)"', response.text)
+        urls_candidate = re.findall(r'href="(.*?)"', response.text)
         for url_candidate in urls_candidate:
-            if re.match(r'https://new.qq.com/.*?\d{8}[VA]0[0-9A-Z]{4}00',
+            if re.match(r'http://www.news.cn/.*?/\d{4}-\d{2}/\d{2}/c_\d{10}\.htm',
                         url_candidate) is not None:
-                logging.info('Crawl the %s', url_candidate)
+                logging.info('Crawl the %s from Xinhua', url_candidate)
                 yield Request(url=url_candidate,
-                              callback=self.parse_tencent_news)
+                              callback=self.parse_xinhua_news)
 
-    def parse_tencent_news(self, response):
+    def parse_xinhua_news(self, response):
         '''
         parse single news item
         '''
@@ -136,7 +136,6 @@ class XinhuaNewsAllQuantitySpider(scrapy.Spider):
         '''
         Get all possible urls
         '''
-        # http://www.news.cn/world/2022-10/30/c_1129088514.htm
         for date in range(self.begin_date, self.end_date + 1):
             month_day = date % 10000
             month_day_legal = False
@@ -171,6 +170,6 @@ class XinhuaNewsAllQuantitySpider(scrapy.Spider):
         if response.status == 200 and \
            response.xpath('//div[@class="zjd"]/p/text()').extract_first() == \
                 '对不起，您要访问的页面不存在或已被删除!':
-            logging.info('Crawl the %s', response.url)
+            logging.info('Crawl the %s from Xinhua', response.url)
             item_loader = parse_xinhua_to_item_loader(response)
             yield item_loader.load_item()
