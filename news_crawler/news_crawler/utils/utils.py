@@ -31,7 +31,6 @@ class TencentIncrementTimer():
             urls = json.load(file)
         self.start_urls = urls['tencent_news']
 
-
     def execute(self):
         """
         Trigger timer.
