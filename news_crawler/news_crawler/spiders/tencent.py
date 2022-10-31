@@ -2,6 +2,7 @@
 Crawler of Tencent
 '''
 
+import logging
 import re
 import threading
 import json
@@ -26,11 +27,12 @@ def parse_detail_to_item_loader(response):
         '/html/head/script[7]/text()').extract_first()
     item_loader.add_value('media', re.findall(
         r'"media": "(.*?)"', window_data)[0])
-    for catalog in re.findall(r'"catalog\d+": "(.*?)"', window_data):
+    for catalog in re.findall(r'"catalog1": "(.*?)"', window_data):
         item_loader.add_value('category', catalog)
     for tag in re.findall(r'"tags": "(.*?)"', window_data)[0].split(','):
         item_loader.add_value('tags', tag)
-    item_loader.add_xpath('title', '/html/head/title/text()')
+    for title in re.findall(r'"title": "(.*?)"', window_data):
+        item_loader.add_value('title', title)
     item_loader.add_xpath('description', '/html/head/meta[2]/@content')
     item_loader.add_value('description', '')
     item_loader.add_xpath(
@@ -48,34 +50,36 @@ def parse_detail_to_item_loader(response):
     return item_loader
 
 
-class TencentNewsHomePageSpider(RedisSpider):
+class TencentNewsIncreSpider(RedisSpider):
     '''
-    Crawl the TencentNewsHomePage
+    Crawl the TencentNewsIncre
     '''
-    name = 'TencentNewsHomePage'
-    allowed_domains = ['news.qq.com', 'new.qq.com']
-    redis_key = "TencentNewsHomePage:start_urls"
+    name = 'TencentNewsIncre'
+    redis_key = "TencentNewsIncre:start_urls"
 
     def __init__(self, *args, **kwargs):
         '''
         Init the spider
         '''
-        self.data_table = kwargs.get('data_table')
-        self.incre_timer = IncreTimer.TencentIncrementTimer()
-        self.start_urls_execute = threading.Thread(
-            target=self.incre_timer.execute, daemon=True)
-        self.start_urls_execute.start()
+        self.data_table = kwargs.get('data_table', 'news')
+        self.attribution = kwargs.get('attribution', 'minor')
+        if self.attribution == 'main':
+            incre_timer = IncreTimer.TencentIncrementTimer()
+            start_urls_execute = threading.Thread(
+                target=incre_timer.execute, daemon=True)
+            start_urls_execute.start()
         super().__init__(*args, **kwargs)
 
     def parse(self, response, **_kwargs):
         '''
         Get all legal urls
         '''
-        urls_candidate = response.xpath('//a/@href').extract()
+        logging.info('Find news_url from %s', response.url)
+        urls_candidate = re.findall(r'"url":"(.*?)"', response.text)
         for url_candidate in urls_candidate:
-            # https://new.qq.com/omn/20221016/20221016A068MZ00.html
-            if re.match(r'https://new.qq.com/.*?\d{8}[VA]0[0-9A-Z]{4}00\.html',
+            if re.match(r'https://new.qq.com/.*?\d{8}[VA]0[0-9A-Z]{4}00',
                         url_candidate) is not None:
+                logging.info('Crawl the %s', url_candidate)
                 yield Request(url=url_candidate,
                               callback=self.parse_tencent_news)
 
@@ -101,7 +105,7 @@ class TencentNewsAllQuantitySpider(scrapy.Spider):
         Init the legal characters
         '''
         super().__init__()
-        self.data_table = kwargs.get('data_table')
+        self.data_table = kwargs.get('data_table', 'news')
         self.begin_date = int(kwargs.get('begin_date', '20221008'))
         self.end_date = int(kwargs.get('end_date', '20221008'))
         self.legal = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
@@ -109,7 +113,8 @@ class TencentNewsAllQuantitySpider(scrapy.Spider):
                       'H', 'I', 'J', 'K', 'L', 'M', 'N',
                       'O', 'P', 'Q', 'R', 'S', 'T',
                       'U', 'V', 'W', 'X', 'Y', 'Z']
-        self.legal_first = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+        self.legal_first = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+                            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
         self.legal_date = ((101, 131), (201, 228), (301, 331),
                            (401, 430), (501, 531), (601, 630),
                            (701, 731), (801, 831), (901, 930),
@@ -162,5 +167,6 @@ class TencentNewsAllQuantitySpider(scrapy.Spider):
         '''
         if response.status == 200 and \
            response.url != 'https://www.qq.com/?pgv_ref=404':
+            logging.info('Crawl the %s', response.url)
             item_loader = parse_detail_to_item_loader(response)
             yield item_loader.load_item()
