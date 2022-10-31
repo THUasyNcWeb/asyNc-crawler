@@ -61,11 +61,13 @@ class TencentNewsIncreSpider(RedisSpider):
         '''
         Init the spider
         '''
-        self.data_table = kwargs.get('data_table')
-        self.incre_timer = IncreTimer.TencentIncrementTimer()
-        self.start_urls_execute = threading.Thread(
-            target=self.incre_timer.execute, daemon=True)
-        self.start_urls_execute.start()
+        self.data_table = kwargs.get('data_table', 'news')
+        self.attribution = kwargs.get('attribution', 'minor')
+        if self.attribution == 'main':
+            incre_timer = IncreTimer.TencentIncrementTimer()
+            start_urls_execute = threading.Thread(
+                target=incre_timer.execute, daemon=True)
+            start_urls_execute.start()
         super().__init__(*args, **kwargs)
 
     def parse(self, response, **_kwargs):
@@ -101,7 +103,7 @@ class TencentNewsAllQuantitySpider(scrapy.Spider):
         Init the legal characters
         '''
         super().__init__()
-        self.data_table = kwargs.get('data_table')
+        self.data_table = kwargs.get('data_table', 'news')
         self.begin_date = int(kwargs.get('begin_date', '20221008'))
         self.end_date = int(kwargs.get('end_date', '20221008'))
         self.legal = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
