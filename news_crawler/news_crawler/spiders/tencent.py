@@ -65,8 +65,8 @@ class TencentNewsIncreSpider(RedisSpider):
         self.attribution = kwargs.get('attribution', 'minor')
         if self.attribution == 'main':
             incre_timer = \
-                IncreTimer.TencentIncrementTimer('tencent_news',
-                                                 'TencentNewsIncre:start_urls')
+                IncreTimer.IncrementTimer('tencent_news',
+                                          'TencentNewsIncre:start_urls')
             start_urls_execute = threading.Thread(
                 target=incre_timer.execute, daemon=True)
             start_urls_execute.start()

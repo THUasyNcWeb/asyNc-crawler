@@ -30,7 +30,7 @@ def parse_xinhua_to_item_loader(response):
     item_loader.add_value('description', '')
 
     image_last = response.xpath(r'//img[@id]/@src').extract_first()
-    if image_last == None:
+    if image_last is None:
         item_loader.add_value('first_img_url', '')
     else:
         image_pre = re.findall(
@@ -67,8 +67,9 @@ class XinhuaNewsIncreSpider(RedisSpider):
         self.data_table = kwargs.get('data_table', 'news')
         self.attribution = kwargs.get('attribution', 'minor')
         if self.attribution == 'main':
-            incre_timer = IncreTimer.TencentIncrementTimer('xinhua_news',
-                                                 'XinhuaNewsIncre:start_urls')
+            incre_timer = \
+                IncreTimer.IncrementTimer('xinhua_news',
+                                          'XinhuaNewsIncre:start_urls')
             start_urls_execute = threading.Thread(
                 target=incre_timer.execute, daemon=True)
             start_urls_execute.start()
@@ -81,7 +82,7 @@ class XinhuaNewsIncreSpider(RedisSpider):
         logging.info('Find news_url from %s', response.url)
         urls_candidate = re.findall(r'href="(.*?)"', response.text)
         for url_candidate in urls_candidate:
-            if re.match(r'http://www.news.cn/.*?/\d{4}-\d{2}/\d{2}/c_\d{10}\.htm',
+            if re.match(r'http://www.news.cn/.*?/\d{4}-\d{2}/\d{2}/c_\d{10}',
                         url_candidate) is not None:
                 logging.info('Crawl the %s from Xinhua', url_candidate)
                 yield Request(url=url_candidate,
@@ -153,8 +154,8 @@ class XinhuaNewsAllQuantitySpider(scrapy.Spider):
 
             date_trans = '/' + str(date)[:4] + '-' + \
                 str(date)[4:6] + '/' + str(date)[6:]
-            for id in range(0, 1000000):
-                id_tran = str(id)
+            for news_id in range(0, 1000000):
+                id_tran = str(news_id)
                 while len(id_tran) < 6:
                     id_tran = '0' + id_tran
                 for category in self.categories:

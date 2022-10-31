@@ -8,7 +8,7 @@ import logging
 import redis
 
 
-class Timer():
+class IncrementTimer():
     """
     Incremental crawl timer.
     """
