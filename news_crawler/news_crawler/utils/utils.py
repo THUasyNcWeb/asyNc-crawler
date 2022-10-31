@@ -26,7 +26,7 @@ class TencentIncrementTimer():
                                     port=port,
                                     decode_responses=True,
                                     password=password)
-        with open('./url.json', 'r', encoding='utf-8') as file:
+        with open('./web_news_config.json', 'r', encoding='utf-8') as file:
             urls = json.load(file)
         self.start_urls = urls['tencent_news']
 
