@@ -36,7 +36,7 @@ class TencentIncrementTimer():
         Trigger timer.
         """
         self.add_job()
-        schedule.every(60).seconds.do(self.add_job)
+        schedule.every(1).seconds.do(self.add_job)
         while True:
             schedule.run_pending()
             time.sleep(0.5)
