@@ -15,7 +15,7 @@ from news_crawler.items import NewsCrawlerItem, NewsCrawlerItemLoader
 import news_crawler.utils.utils as IncreTimer
 
 
-def parse_detail_to_item_loader(response):
+def parse_tencent_to_item_loader(response):
     '''
     parse single news item
     '''
@@ -87,7 +87,7 @@ class TencentNewsIncreSpider(RedisSpider):
         '''
         parse single news item
         '''
-        item_loader = parse_detail_to_item_loader(response)
+        item_loader = parse_tencent_to_item_loader(response)
 
         yield item_loader.load_item()
 
@@ -168,5 +168,5 @@ class TencentNewsAllQuantitySpider(scrapy.Spider):
         if response.status == 200 and \
            response.url != 'https://www.qq.com/?pgv_ref=404':
             logging.info('Crawl the %s', response.url)
-            item_loader = parse_detail_to_item_loader(response)
+            item_loader = parse_tencent_to_item_loader(response)
             yield item_loader.load_item()
