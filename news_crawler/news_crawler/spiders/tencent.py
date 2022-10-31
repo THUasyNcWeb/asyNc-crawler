@@ -49,13 +49,13 @@ def parse_detail_to_item_loader(response):
     return item_loader
 
 
-class TencentNewsHomePageSpider(RedisSpider):
+class TencentNewsIncreSpider(RedisSpider):
     '''
-    Crawl the TencentNewsHomePage
+    Crawl the TencentNewsIncre
     '''
-    name = 'TencentNewsHomePage'
+    name = 'TencentNewsIncre'
     allowed_domains = ['news.qq.com', 'new.qq.com']
-    redis_key = "TencentNewsHomePage:start_urls"
+    redis_key = "TencentNewsIncre:start_urls"
 
     def __init__(self, *args, **kwargs):
         '''
@@ -72,9 +72,8 @@ class TencentNewsHomePageSpider(RedisSpider):
         '''
         Get all legal urls
         '''
-        urls_candidate = response.xpath('//a/@href').extract()
+        urls_candidate = re.findall(r'"url":"(.*?)"',response.text)
         for url_candidate in urls_candidate:
-            # https://new.qq.com/omn/20221016/20221016A068MZ00.html
             if re.match(r'https://new.qq.com/.*?\d{8}[VA]0[0-9A-Z]{4}00\.html',
                         url_candidate) is not None:
                 yield Request(url=url_candidate,
