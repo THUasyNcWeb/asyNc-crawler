@@ -29,10 +29,7 @@ class TencentIncrementTimer():
                                     password=password)
         with open('./url.json', 'r', encoding='utf-8') as file:
             urls = json.load(file)
-        self.start_urls = []
-        base = urls['tencent_news']['base']
-        for variable in urls["tencent_news"]["variable"]:
-            self.start_urls.append(base.format(variable))
+        self.start_urls = urls['tencent_news']
 
 
     def execute(self):
@@ -40,7 +37,7 @@ class TencentIncrementTimer():
         Trigger timer.
         """
         self.add_job()
-        schedule.every(1).seconds.do(self.add_job)
+        schedule.every(60).seconds.do(self.add_job)
         while True:
             schedule.run_pending()
             time.sleep(0.5)

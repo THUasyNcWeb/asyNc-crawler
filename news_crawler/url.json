@@ -1,25 +1,22 @@
 {
-    "tencent_news": {
-        "base": "https://i.news.qq.com/trpc.qqnews_web.kv_srv.kv_srv_http_proxy/list?sub_srv_id={}&srv_id=pc&offset=0&limit=199&strategy=1&ext={\"pool\":[\"top\",\"hot\"],\"is_filter\":7,\"check_type\":true}",
-        "variable": [
-            "24hours",
-            "bj",
-            "ent",
-            "sports",
-            "nba",
-            "milite",
-            "world",
-            "tech",
-            "finance",
-            "auto",
-            "games",
-            "fashion",
-            "house",
-            "digi",
-            "health",
-            "history",
-            "football",
-            "edu"
-        ]
-    }
+    "tencent_news": [
+        "https://i.news.qq.com/trpc.qqnews_web.kv_srv.kv_srv_http_proxy/list?sub_srv_id=24hours&srv_id=pc&offset=0&limit=199&strategy=1&ext={\"pool\":[\"top\",\"hot\"],\"is_filter\":7,\"check_type\":true}",
+        "https://i.news.qq.com/trpc.qqnews_web.kv_srv.kv_srv_http_proxy/list?sub_srv_id=bj&srv_id=pc&offset=0&limit=199&strategy=1&ext={\"pool\":[\"top\",\"hot\"],\"is_filter\":7,\"check_type\":true}",
+        "https://i.news.qq.com/trpc.qqnews_web.kv_srv.kv_srv_http_proxy/list?sub_srv_id=ent&srv_id=pc&offset=0&limit=199&strategy=1&ext={\"pool\":[\"top\",\"hot\"],\"is_filter\":7,\"check_type\":true}",
+        "https://i.news.qq.com/trpc.qqnews_web.kv_srv.kv_srv_http_proxy/list?sub_srv_id=sports&srv_id=pc&offset=0&limit=199&strategy=1&ext={\"pool\":[\"top\",\"hot\"],\"is_filter\":7,\"check_type\":true}",
+        "https://i.news.qq.com/trpc.qqnews_web.kv_srv.kv_srv_http_proxy/list?sub_srv_id=nba&srv_id=pc&offset=0&limit=199&strategy=1&ext={\"pool\":[\"top\",\"hot\"],\"is_filter\":7,\"check_type\":true}",
+        "https://i.news.qq.com/trpc.qqnews_web.kv_srv.kv_srv_http_proxy/list?sub_srv_id=milite&srv_id=pc&offset=0&limit=199&strategy=1&ext={\"pool\":[\"top\",\"hot\"],\"is_filter\":7,\"check_type\":true}",
+        "https://i.news.qq.com/trpc.qqnews_web.kv_srv.kv_srv_http_proxy/list?sub_srv_id=world&srv_id=pc&offset=0&limit=199&strategy=1&ext={\"pool\":[\"top\",\"hot\"],\"is_filter\":7,\"check_type\":true}",
+        "https://i.news.qq.com/trpc.qqnews_web.kv_srv.kv_srv_http_proxy/list?sub_srv_id=tech&srv_id=pc&offset=0&limit=199&strategy=1&ext={\"pool\":[\"top\",\"hot\"],\"is_filter\":7,\"check_type\":true}",
+        "https://i.news.qq.com/trpc.qqnews_web.kv_srv.kv_srv_http_proxy/list?sub_srv_id=finance&srv_id=pc&offset=0&limit=199&strategy=1&ext={\"pool\":[\"top\",\"hot\"],\"is_filter\":7,\"check_type\":true}",
+        "https://i.news.qq.com/trpc.qqnews_web.kv_srv.kv_srv_http_proxy/list?sub_srv_id=auto&srv_id=pc&offset=0&limit=199&strategy=1&ext={\"pool\":[\"top\",\"hot\"],\"is_filter\":7,\"check_type\":true}",
+        "https://i.news.qq.com/trpc.qqnews_web.kv_srv.kv_srv_http_proxy/list?sub_srv_id=games&srv_id=pc&offset=0&limit=199&strategy=1&ext={\"pool\":[\"top\",\"hot\"],\"is_filter\":7,\"check_type\":true}",
+        "https://i.news.qq.com/trpc.qqnews_web.kv_srv.kv_srv_http_proxy/list?sub_srv_id=fashion&srv_id=pc&offset=0&limit=199&strategy=1&ext={\"pool\":[\"top\",\"hot\"],\"is_filter\":7,\"check_type\":true}",
+        "https://i.news.qq.com/trpc.qqnews_web.kv_srv.kv_srv_http_proxy/list?sub_srv_id=house&srv_id=pc&offset=0&limit=199&strategy=1&ext={\"pool\":[\"top\",\"hot\"],\"is_filter\":7,\"check_type\":true}",
+        "https://i.news.qq.com/trpc.qqnews_web.kv_srv.kv_srv_http_proxy/list?sub_srv_id=digi&srv_id=pc&offset=0&limit=199&strategy=1&ext={\"pool\":[\"top\",\"hot\"],\"is_filter\":7,\"check_type\":true}",
+        "https://i.news.qq.com/trpc.qqnews_web.kv_srv.kv_srv_http_proxy/list?sub_srv_id=health&srv_id=pc&offset=0&limit=199&strategy=1&ext={\"pool\":[\"top\",\"hot\"],\"is_filter\":7,\"check_type\":true}",
+        "https://i.news.qq.com/trpc.qqnews_web.kv_srv.kv_srv_http_proxy/list?sub_srv_id=history&srv_id=pc&offset=0&limit=199&strategy=1&ext={\"pool\":[\"top\",\"hot\"],\"is_filter\":7,\"check_type\":true}",
+        "https://i.news.qq.com/trpc.qqnews_web.kv_srv.kv_srv_http_proxy/list?sub_srv_id=football&srv_id=pc&offset=0&limit=199&strategy=1&ext={\"pool\":[\"top\",\"hot\"],\"is_filter\":7,\"check_type\":true}",
+        "https://i.news.qq.com/trpc.qqnews_web.kv_srv.kv_srv_http_proxy/list?sub_srv_id=edu&srv_id=pc&offset=0&limit=199&strategy=1&ext={\"pool\":[\"top\",\"hot\"],\"is_filter\":7,\"check_type\":true}"
+    ]
 }

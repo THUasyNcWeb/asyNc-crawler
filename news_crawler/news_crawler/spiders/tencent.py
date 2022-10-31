@@ -54,7 +54,6 @@ class TencentNewsIncreSpider(RedisSpider):
     Crawl the TencentNewsIncre
     '''
     name = 'TencentNewsIncre'
-    allowed_domains = ['news.qq.com', 'new.qq.com']
     redis_key = "TencentNewsIncre:start_urls"
 
     def __init__(self, *args, **kwargs):
