@@ -2,6 +2,7 @@
 Crawler of Tencent
 '''
 
+import logging
 import re
 import threading
 import json
@@ -73,10 +74,12 @@ class TencentNewsIncreSpider(RedisSpider):
         '''
         Get all legal urls
         '''
+        logging.info('Find news_url from %s', response.url)
         urls_candidate = re.findall(r'"url":"(.*?)"', response.text)
         for url_candidate in urls_candidate:
-            if re.match(r'https://new.qq.com/.*?\d{8}[VA]0[0-9A-Z]{4}00\.html',
+            if re.match(r'https://new.qq.com/.*?\d{8}[VA]0[0-9A-Z]{4}00',
                         url_candidate) is not None:
+                logging.info('Crawl the %s', url_candidate)
                 yield Request(url=url_candidate,
                               callback=self.parse_tencent_news)
 
@@ -110,7 +113,8 @@ class TencentNewsAllQuantitySpider(scrapy.Spider):
                       'H', 'I', 'J', 'K', 'L', 'M', 'N',
                       'O', 'P', 'Q', 'R', 'S', 'T',
                       'U', 'V', 'W', 'X', 'Y', 'Z']
-        self.legal_first = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+        self.legal_first = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+                            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
         self.legal_date = ((101, 131), (201, 228), (301, 331),
                            (401, 430), (501, 531), (601, 630),
                            (701, 731), (801, 831), (901, 930),
@@ -163,5 +167,6 @@ class TencentNewsAllQuantitySpider(scrapy.Spider):
         '''
         if response.status == 200 and \
            response.url != 'https://www.qq.com/?pgv_ref=404':
+            logging.info('Crawl the %s', response.url)
             item_loader = parse_detail_to_item_loader(response)
             yield item_loader.load_item()
