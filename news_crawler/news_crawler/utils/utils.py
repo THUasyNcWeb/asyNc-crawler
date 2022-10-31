@@ -20,13 +20,13 @@ class TencentIncrementTimer():
         """
         with open('../config/redis.json', 'r', encoding='utf-8') as file:
             config = json.load(file)
-        host = config['host']
-        port = config['port']
-        password = config['password']
-        self.my_redis = redis.Redis(host=host,
-                                    port=port,
+        self.host = config['host']
+        self.port = config['port']
+        self.password = config['password']
+        self.my_redis = redis.Redis(host=self.host,
+                                    port=self.port,
                                     decode_responses=True,
-                                    password=password)
+                                    password=self.password)
         with open('./url.json', 'r', encoding='utf-8') as file:
             urls = json.load(file)
         self.start_urls = urls['tencent_news']
