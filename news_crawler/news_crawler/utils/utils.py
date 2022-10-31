@@ -20,13 +20,20 @@ class TencentIncrementTimer():
         """
         with open('../config/redis.json', 'r', encoding='utf-8') as file:
             config = json.load(file)
-        self.host = config['host']
-        self.port = config['port']
-        self.password = config['password']
-        self.my_redis = redis.Redis(host=self.host,
-                                    port=self.port,
+        host = config['host']
+        port = config['port']
+        password = config['password']
+        self.my_redis = redis.Redis(host=host,
+                                    port=port,
                                     decode_responses=True,
-                                    password=self.password)
+                                    password=password)
+        with open('./url.json', 'r', encoding='utf-8') as file:
+            urls = json.load(file)
+        self.start_urls = []
+        base = urls['tencent_news']['base']
+        for variable in urls["tencent_news"]["variable"]:
+            self.start_urls.append(base.format(variable))
+
 
     def execute(self):
         """
@@ -42,16 +49,12 @@ class TencentIncrementTimer():
         """
         Add job into redis.
         """
-        logging.info('Insert start_urls into TencentNewsHomePage:start_urls')
-        start_urls = ['https://news.qq.com/',
-                      'https://new.qq.com/d/bj/',
-                      'https://new.qq.com/ch/ent/',
-                      'https://new.qq.com/ch/tech/']
-        for start_url in start_urls:
+        logging.info('Insert start_urls into TencentNewsIncre:start_urls')
+        for start_url in self.start_urls:
             start = {}
             start['url'] = start_url
-            start['meta'] = {'crawler': 'TencentNewsHomePage'}
-            self.my_redis.lpush('TencentNewsHomePage:start_urls',
+            start['meta'] = {'crawler': 'TencentNewsIncre'}
+            self.my_redis.lpush('TencentNewsIncre:start_urls',
                                 json.dumps(start))
 
 
