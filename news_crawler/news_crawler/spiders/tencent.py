@@ -30,7 +30,8 @@ def parse_detail_to_item_loader(response):
         item_loader.add_value('category', catalog)
     for tag in re.findall(r'"tags": "(.*?)"', window_data)[0].split(','):
         item_loader.add_value('tags', tag)
-    item_loader.add_xpath('title', '/html/head/title/text()')
+    for title in re.findall(r'"title": "(.*?)"'):
+        item_loader.add_value('title', title)
     item_loader.add_xpath('description', '/html/head/meta[2]/@content')
     item_loader.add_value('description', '')
     item_loader.add_xpath(
