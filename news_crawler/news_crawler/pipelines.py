@@ -6,67 +6,6 @@ import json
 import logging
 from scrapy.exporters import JsonItemExporter
 import psycopg2
-from elasticsearch_dsl import Document, Date, Keyword, Text, connections
-import elasticsearch
-
-
-class ArticleType(Document):
-    '''
-    Define the article type
-    '''
-    title = Text(analyzer="ik_max_word", search_analyzer="ik_smart")
-    content = Text(analyzer="ik_max_word", search_analyzer="ik_smart")
-    tags = Text(analyzer="ik_max_word", search_analyzer="ik_smart")
-    first_img_url = Keyword()
-    news_url = Keyword()
-    front_image_path = Keyword()
-    media = Keyword()
-    create_date = Date()
-
-    def get_url(self):
-        """
-        return article's url
-        """
-        return self.news_url
-
-    def get_content(self):
-        """
-        return content
-        """
-        return self.content
-
-    class Index:
-        """
-        Index to connect
-        """
-        name = "tencent_news"
-
-        def get_index(self):
-            """
-            return index's name
-            """
-            return self.name
-
-        def set_index(self, index_name):
-            """
-            set index
-            """
-            self.name = index_name
-
-
-def write_to_es(item_json):
-    """
-    Export item_json into Elasticsearh
-    """
-    article = ArticleType(meta={'id': item_json['news_url']})
-    article.title = item_json['title']
-    article.create_date = item_json['pub_time']
-    article.news_url = item_json['news_url']
-    article.first_img_url = item_json['first_img_url']
-    article.content = item_json['content']
-    article.media = item_json['media']
-    article.tags = item_json['tags']
-    article.save()
 
 
 class SQLPipeline:
@@ -88,14 +27,6 @@ class SQLPipeline:
             user=self.postgres[2], password=self.postgres[3],
             dbname=self.postgres[4])
         self.cur = self.connection.cursor()
-
-        with open('../config/es.json', 'r', encoding='utf-8') as file:
-            es_config = json.load(file)
-            try:
-                connections.create_connection(hosts=[es_config['url']])
-                ArticleType.init()
-            except (elasticsearch.exceptions.ConnectionError, ConnectionError):
-                print("Elasticseach not run")
 
     def process_item(self, item, spider):
         '''
@@ -160,11 +91,6 @@ class SQLPipeline:
                 JsonItemExporter(file, encoding="utf-8",
                                  ensure_ascii=False).export_item(item)
                 file.close()
-        try:
-            if not dul_tag:
-                write_to_es(item)
-        except (elasticsearch.exceptions.ConnectionError, ConnectionError):
-            print("Elasticseach not run")
         return item
 
     def close_spider(self, _spider):

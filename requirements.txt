@@ -3,10 +3,8 @@ Scrapy==2.5.1
 selenium
 lxml
 webdriver_manager
-elasticsearch_dsl
 scrapy-testmaster
 pyOpenSSL==22.0.0
-elasticsearch
 scrapy-redis
 redis
 schedule
