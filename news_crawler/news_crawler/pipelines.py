@@ -4,8 +4,6 @@ Scrapy pipelines
 
 import json
 import logging
-import hashlib
-import urllib.request
 from scrapy.exporters import JsonItemExporter
 import psycopg2
 from elasticsearch_dsl import Document, Date, Keyword, Text, connections
@@ -91,11 +89,6 @@ class SQLPipeline:
             dbname=self.postgres[4])
         self.cur = self.connection.cursor()
 
-        with open('../config/image_path.json', 'r', encoding='utf-8') as file:
-            config = json.load(file)
-        self.image_download_path = config['path']
-        self.image_prefix = config['prefix']
-
         with open('../config/es.json', 'r', encoding='utf-8') as file:
             es_config = json.load(file)
             try:
@@ -126,22 +119,6 @@ class SQLPipeline:
                 self.cur = self.connection.cursor()
             except psycopg2.OperationalError:
                 pass
-
-        try:
-            if not dul_tag and item['first_img_url'] != '':
-                img_url = item['first_img_url'].strip()
-                md5 = hashlib.md5(img_url.encode(encoding='UTF-8')) \
-                             .hexdigest()
-                item['first_img_url'] = 'https:' + \
-                                        item['first_img_url']
-                filepath = self.image_download_path + md5 + '.jpg'
-                urllib.request.urlretrieve(
-                    item['first_img_url'], filename=filepath)
-                item['first_img_url'] = self.image_prefix + \
-                    md5 + '.jpg'
-        except urllib.error.URLError:
-            print("Error occurred when downloading file, error message:")
-            print('urllib.error.URLError')
 
         try:
             if not dul_tag:
