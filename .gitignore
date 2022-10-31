@@ -9,4 +9,3 @@ config/
 .coverage
 xunit-reports
 coverage-reports
-images/

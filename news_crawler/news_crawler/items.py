@@ -41,9 +41,7 @@ class NewsCrawlerItem(scrapy.Item):
     Define every field of NewsCrawlerItem
     """
     news_url = scrapy.Field()
-    category = scrapy.Field(
-        output_processor=Identity()
-    )
+    category = scrapy.Field()
     media = scrapy.Field()
     tags = scrapy.Field(
         output_processor=Identity()

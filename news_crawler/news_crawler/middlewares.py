@@ -14,9 +14,9 @@ from selenium.webdriver.chrome.service import Service as ChromeService
 from webdriver_manager.chrome import ChromeDriverManager
 
 
-class TencentNewsHomePageDownloaderMiddleware:
+class TencentNewsIncreDownloaderMiddleware:
     """
-    Download all message in TencentNewsHomePage
+    Download all message in TencentNewsIncre
     """
     @classmethod
     def from_crawler(cls, crawler):
@@ -30,10 +30,10 @@ class TencentNewsHomePageDownloaderMiddleware:
 
     def process_response(self, request, response, spider):
         '''
-        Use selenium to get all message from TencentNewsHomePage
+        Use selenium to get all message from TencentNewsIncre
         '''
         del spider
-        if request.meta.get("crawler") != "TencentNewsHomePage":
+        if request.meta.get("crawler") != "TencentNewsIncre":
             return response
 
         logging.info('selenium download %s', request.url)
