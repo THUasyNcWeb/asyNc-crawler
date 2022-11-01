@@ -15,7 +15,7 @@ from news_crawler.items import NewsCrawlerItem, NewsCrawlerItemLoader
 import news_crawler.utils.utils as IncreTimer
 
 
-def parse_tencent_to_item_loader(response):
+def parse_xinhua_to_item_loader(response):
     '''
     parse single news item
     '''
@@ -23,39 +23,47 @@ def parse_tencent_to_item_loader(response):
         item=NewsCrawlerItem(), response=response)
 
     item_loader.add_value('news_url', response.url)
-    window_data = response.xpath(
-        '/html/head/script[7]/text()').extract_first()
-    item_loader.add_value('media', re.findall(
-        r'"media": "(.*?)"', window_data)[0])
-    for catalog in re.findall(r'"catalog1": "(.*?)"', window_data):
-        item_loader.add_value('category', catalog)
-    for tag in re.findall(r'"tags": "(.*?)"', window_data)[0].split(','):
-        item_loader.add_value('tags', tag)
-    for title in re.findall(r'"title": "(.*?)"', window_data):
-        item_loader.add_value('title', title)
-    item_loader.add_xpath('description', '/html/head/meta[2]/@content')
+    media = response.xpath('//body//div[@class="source"]/text()')\
+                    .extract_first()
+    item_loader.add_value('media', re.findall(r'\r\n来源：(.*)\r\n', media)[0])
+    item_loader.add_xpath('tags', '/html/head/meta[@name="keywords"]/@content')
+    title = response.xpath('/html//title/text()').extract_first()
+    item_loader.add_value('title', re.findall(r'\r\n(.*?)-新华网\r\n', title)[0])
+    item_loader.add_xpath('title', '//span[@class="title"]/text()')
+    item_loader.add_xpath('description',
+                          '/html/head/meta[@name="description"]/@content')
     item_loader.add_value('description', '')
-    item_loader.add_xpath(
-        'first_img_url', '//img[@class="content-picture"]/@src')
-    item_loader.add_value('first_img_url', '')
+
+    image_last = response.xpath('//img[@id]/@src').extract_first()
+    if image_last is None:
+        item_loader.add_value('first_img_url', '')
+    else:
+        image_pre = re.findall(
+            r'(http://www.news.cn/.*?/\d{4}-\d{2}/\d{2}/).*?', response.url)[0]
+        item_loader.add_value('first_img_url', image_pre + image_last)
+
+    time_label = response.xpath('//div[@class="info"]').extract_first()
     item_loader.add_value('pub_time', re.findall(
-        r'"pubtime": "(.*?)"', window_data)[0])
-    paras = response.xpath(
-        '/html/body/div[3]/div[1]/div[1]/div[2]/p/text()').extract()
+        r'.*?(\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}).*', time_label)[0])
+
+    paras = response.xpath('//div[@id="detail"]/p/text()').extract()
     if len(paras) == 0:
         paras.append('')
     for para in paras:
         item_loader.add_value('content', para)
 
+    item_loader.add_value('category', re.findall(
+        r'http://www.news.cn/(.*?)/.*', response.url)[0])
+
     return item_loader
 
 
-class TencentNewsIncreSpider(RedisSpider):
+class XinhuaNewsIncreSpider(RedisSpider):
     '''
-    Crawl the TencentNewsIncre
+    Crawl the XinhuaNewsIncre
     '''
-    name = 'TencentNewsIncre'
-    redis_key = "TencentNewsIncre:start_urls"
+    name = 'XinhuaNewsIncre'
+    redis_key = "XinhuaNewsIncre:start_urls"
 
     def __init__(self, *args, **kwargs):
         '''
@@ -65,8 +73,8 @@ class TencentNewsIncreSpider(RedisSpider):
         self.attribution = kwargs.get('attribution', 'minor')
         if self.attribution == 'main':
             incre_timer = \
-                IncreTimer.IncrementTimer('tencent_news',
-                                          'TencentNewsIncre:start_urls')
+                IncreTimer.IncrementTimer('xinhua_news',
+                                          'XinhuaNewsIncre:start_urls')
             start_urls_execute = threading.Thread(
                 target=incre_timer.execute, daemon=True)
             start_urls_execute.start()
@@ -77,29 +85,28 @@ class TencentNewsIncreSpider(RedisSpider):
         Get all legal urls
         '''
         logging.info('Find news_url from %s', response.url)
-        urls_candidate = re.findall(r'"url":"(.*?)"', response.text)
+        urls_candidate = re.findall(r'href="(.*?)"', response.text)
         for url_candidate in urls_candidate:
-            if re.match(r'https://new.qq.com/.*?\d{8}[VA]0[0-9A-Z]{4}00',
+            if re.match(r'http://www.news.cn/.*?/\d{4}-\d{2}/\d{2}/c_\d{10}',
                         url_candidate) is not None:
-                logging.info('Crawl the %s', url_candidate)
+                logging.info('Crawl the %s from Xinhua', url_candidate)
                 yield Request(url=url_candidate,
-                              callback=self.parse_tencent_news)
+                              callback=self.parse_xinhua_news)
 
-    def parse_tencent_news(self, response):
+    def parse_xinhua_news(self, response):
         '''
         parse single news item
         '''
-        item_loader = parse_tencent_to_item_loader(response)
+        item_loader = parse_xinhua_to_item_loader(response)
 
         yield item_loader.load_item()
 
 
-class TencentNewsAllQuantitySpider(scrapy.Spider):
+class XinhuaNewsAllQuantitySpider(scrapy.Spider):
     '''
-    Crawl the TencentNews with all quantity
+    Crawl the XinhuaNews with all quantity
     '''
-    name = 'TencentNewsAllQuantity'
-    allowed_domains = ['new.qq.com']
+    name = 'XinhuaNewsAllQuantity'
     start_urls = []
 
     def __init__(self, *_args, **kwargs):
@@ -110,13 +117,6 @@ class TencentNewsAllQuantitySpider(scrapy.Spider):
         self.data_table = kwargs.get('data_table', 'news')
         self.begin_date = int(kwargs.get('begin_date', '20221008'))
         self.end_date = int(kwargs.get('end_date', '20221008'))
-        self.legal = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-                      'A', 'B', 'C', 'D', 'E', 'F', 'G',
-                      'H', 'I', 'J', 'K', 'L', 'M', 'N',
-                      'O', 'P', 'Q', 'R', 'S', 'T',
-                      'U', 'V', 'W', 'X', 'Y', 'Z']
-        self.legal_first = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-                            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
         self.legal_date = ((101, 131), (201, 228), (301, 331),
                            (401, 430), (501, 531), (601, 630),
                            (701, 731), (801, 831), (901, 930),
@@ -132,6 +132,12 @@ class TencentNewsAllQuantitySpider(scrapy.Spider):
                                     decode_responses=True,
                                     password=password)
 
+        with open('./web_news_config.json', 'r', encoding='utf-8') as file:
+            config = json.load(file)
+        self.categories = config['xinhua_categories']
+
+        self.prefixes = ['1128', '1129', '1211']
+
     def start_requests(self):
         '''
         Get all possible urls
@@ -146,29 +152,30 @@ class TencentNewsAllQuantitySpider(scrapy.Spider):
             if not month_day_legal:
                 continue
 
-            if self.my_redis.sismember("TencentNewsAllQuantity:dates",
+            if self.my_redis.sismember("XinhuaNewsAllQuantity:dates",
                                        date):
                 continue
-            self.my_redis.sadd("TencentNewsAllQuantity:dates", date)
-            for first in self.legal_first:
-                for second in self.legal:
-                    for third in self.legal:
-                        for forth in self.legal:
-                            url = 'https://new.qq.com/rain/a/' + \
-                                  str(date) + 'A0' + first + second + \
-                                  third + forth + '00'
-                            yield Request(url)
-                            url = 'https://new.qq.com/rain/a/' + \
-                                  str(date) + 'V0' + first + second + \
-                                  third + forth + '00'
-                            yield Request(url)
+            self.my_redis.sadd("XinhuaNewsAllQuantity:dates", date)
+
+            date_trans = '/' + str(date)[:4] + '-' + \
+                str(date)[4:6] + '/' + str(date)[6:]
+            for news_id in range(0, 1000000):
+                id_tran = str(news_id)
+                while len(id_tran) < 6:
+                    id_tran = '0' + id_tran
+                for category in self.categories:
+                    for prefix in self.prefixes:
+                        url = 'http://www.news.cn/' + category + \
+                            date_trans + '/c_' + prefix + id_tran + '.htm'
+                        yield Request(url)
 
     def parse(self, response, **_kwargs):
         '''
         Parse legal url
         '''
         if response.status == 200 and \
-           response.url != 'https://www.qq.com/?pgv_ref=404':
-            logging.info('Crawl the %s', response.url)
-            item_loader = parse_tencent_to_item_loader(response)
+           response.xpath('//div[@class="zjd"]/p/text()').extract_first() != \
+                '对不起，您要访问的页面不存在或已被删除!':
+            logging.info('Crawl the %s from Xinhua', response.url)
+            item_loader = parse_xinhua_to_item_loader(response)
             yield item_loader.load_item()

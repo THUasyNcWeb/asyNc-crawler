@@ -29,6 +29,21 @@ def delete_space(values):
     return values
 
 
+def delete_enter(values):
+    '''
+    Delete the \r\n between tags
+    '''
+    for value in values:
+        try:
+            value.replace('\n', '')
+            value.replace('\r', '')
+            if len(value) > 30:
+                value = value[0:30]
+        except AttributeError:
+            pass
+    return values
+
+
 class NewsCrawlerItemLoader(ItemLoader):
     """
     Define the ItemLoader with default output processor
@@ -44,9 +59,12 @@ class NewsCrawlerItem(scrapy.Item):
     category = scrapy.Field()
     media = scrapy.Field()
     tags = scrapy.Field(
+        input_processor=MapCompose(delete_enter),
         output_processor=Identity()
     )
-    title = scrapy.Field()
+    title = scrapy.Field(
+        input_processor=MapCompose(delete_space)
+    )
     description = scrapy.Field()
     content = scrapy.Field(
         input_processor=MapCompose(delete_space),
