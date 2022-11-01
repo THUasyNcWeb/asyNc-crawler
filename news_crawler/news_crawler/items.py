@@ -37,6 +37,8 @@ def delete_enter(values):
         try:
             value.replace('\n', '')
             value.replace('\r', '')
+            if len(value) > 30:
+                value = value[0:30]
         except AttributeError:
             pass
     return values
@@ -60,7 +62,9 @@ class NewsCrawlerItem(scrapy.Item):
         input_processor=MapCompose(delete_enter),
         output_processor=Identity()
     )
-    title = scrapy.Field()
+    title = scrapy.Field(
+        input_processor=MapCompose(delete_space)
+    )
     description = scrapy.Field()
     content = scrapy.Field(
         input_processor=MapCompose(delete_space),

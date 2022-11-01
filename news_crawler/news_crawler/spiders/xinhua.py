@@ -23,13 +23,18 @@ def parse_xinhua_to_item_loader(response):
         item=NewsCrawlerItem(), response=response)
 
     item_loader.add_value('news_url', response.url)
-    item_loader.add_xpath('media', '/html/head/meta[3]/@content')
-    item_loader.add_xpath('tags', '/html/head/meta[10]/@content')
+    media = response.xpath('//body//div[@class="source"]/text()')\
+                    .extract_first()
+    item_loader.add_value('media', re.findall(r'\r\n来源：(.*)\r\n', media)[0])
+    item_loader.add_xpath('tags', '/html/head/meta[@name="keywords"]/@content')
+    title = response.xpath('/html//title/text()').extract_first()
+    item_loader.add_value('title', re.findall(r'\r\n(.*?)-新华网\r\n', title)[0])
     item_loader.add_xpath('title', '//span[@class="title"]/text()')
-    item_loader.add_xpath('description', '/html/head/meta[11]/@content')
+    item_loader.add_xpath('description',
+                          '/html/head/meta[@name="description"]/@content')
     item_loader.add_value('description', '')
 
-    image_last = response.xpath(r'//img[@id]/@src').extract_first()
+    image_last = response.xpath('//img[@id]/@src').extract_first()
     if image_last is None:
         item_loader.add_value('first_img_url', '')
     else:
@@ -169,7 +174,7 @@ class XinhuaNewsAllQuantitySpider(scrapy.Spider):
         Parse legal url
         '''
         if response.status == 200 and \
-           response.xpath('//div[@class="zjd"]/p/text()').extract_first() == \
+           response.xpath('//div[@class="zjd"]/p/text()').extract_first() != \
                 '对不起，您要访问的页面不存在或已被删除!':
             logging.info('Crawl the %s from Xinhua', response.url)
             item_loader = parse_xinhua_to_item_loader(response)
