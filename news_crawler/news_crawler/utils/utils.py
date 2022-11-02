@@ -8,6 +8,38 @@ import logging
 import redis
 
 
+class DeDuplicate():
+    """
+    The news weight checker.
+    """
+
+    def __init__(self) -> None:
+        with open('../config/redis.json', 'r', encoding='utf-8') as file:
+            config = json.load(file)
+        host = config['host']
+        port = config['port']
+        password = config['password']
+        self.my_redis = redis.Redis(host=host,
+                                    port=port,
+                                    decode_responses=True,
+                                    password=password)
+        self.key = 'news_name'
+
+    def is_exist(self, name):
+        """
+        Check whether the name exist in the redis.
+        """
+        name_tmp = name[0:10]
+        return self.my_redis.sismember(self.key, name_tmp)
+    
+    def insert(self, name):
+        """
+        Insert the name of news into redis.
+        """
+        name_tmp = name[0:10]
+        self.my_redis.sadd(self.key, name_tmp)
+
+
 class IncrementTimer():
     """
     Incremental crawl timer.
