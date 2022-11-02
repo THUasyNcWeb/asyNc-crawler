@@ -12,7 +12,7 @@ from scrapy.http import Request
 from scrapy_redis.spiders import RedisSpider
 
 from news_crawler.items import NewsCrawlerItem, NewsCrawlerItemLoader
-import news_crawler.utils.utils as IncreTimer
+import news_crawler.utils.utils as Utils
 
 
 def parse_xinhua_to_item_loader(response):
@@ -73,8 +73,8 @@ class XinhuaNewsIncreSpider(RedisSpider):
         self.attribution = kwargs.get('attribution', 'minor')
         if self.attribution == 'main':
             incre_timer = \
-                IncreTimer.IncrementTimer('xinhua_news',
-                                          'XinhuaNewsIncre:start_urls')
+                Utils.IncrementTimer('xinhua_news',
+                                     'XinhuaNewsIncre:start_urls')
             start_urls_execute = threading.Thread(
                 target=incre_timer.execute, daemon=True)
             start_urls_execute.start()

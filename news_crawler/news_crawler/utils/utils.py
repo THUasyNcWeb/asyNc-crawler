@@ -31,7 +31,7 @@ class DeDuplicate():
         """
         name_tmp = name[0:10]
         return self.my_redis.sismember(self.key, name_tmp)
-    
+
     def insert(self, name):
         """
         Insert the name of news into redis.
