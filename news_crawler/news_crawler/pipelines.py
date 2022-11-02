@@ -6,6 +6,7 @@ import json
 import logging
 from scrapy.exporters import JsonItemExporter
 import psycopg2
+import news_crawler.utils.utils as Utils
 
 
 class SQLPipeline:
@@ -27,29 +28,13 @@ class SQLPipeline:
             user=self.postgres[2], password=self.postgres[3],
             dbname=self.postgres[4])
         self.cur = self.connection.cursor()
+        self.de_dul = Utils.DeDuplicate()
 
     def process_item(self, item, spider):
         '''
         Insert the item into the database
         '''
-        dul_tag = True
-        try:
-            query = f'select * from {spider.data_table} where news_url=%s'
-            self.cur.execute(query, (item['news_url'],))
-            if len(self.cur.fetchall()) == 0:
-                dul_tag = False
-        except (psycopg2.errors.InFailedSqlTransaction,
-                psycopg2.OperationalError):
-            self.cur.close()
-            self.connection.close()
-            try:
-                self.connection = psycopg2.connect(
-                    host=self.postgres[0], port=self.postgres[1],
-                    user=self.postgres[2], password=self.postgres[3],
-                    dbname=self.postgres[4])
-                self.cur = self.connection.cursor()
-            except psycopg2.OperationalError:
-                pass
+        dul_tag = self.de_dul.is_exist(item['title'])
 
         try:
             if not dul_tag:
@@ -65,6 +50,7 @@ class SQLPipeline:
                                          item['first_img_url'],
                                          item['pub_time']))
                 self.connection.commit()
+                self.de_dul.insert(item['title'])
         except (psycopg2.errors.InFailedSqlTransaction,
                 psycopg2.OperationalError,
                 KeyError):
