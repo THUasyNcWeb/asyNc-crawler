@@ -70,7 +70,7 @@ class Command(ScrapyCommand):
         Run all QuantitySpider
         '''
         spd_loader_list = ['TencentNewsAllQuantity',
-                           'XInhuaNewsAllQuantity']
+                           'XinhuaNewsAllQuantity']
 
         for _ in range(0, 3):
             for spname in spd_loader_list or args:
