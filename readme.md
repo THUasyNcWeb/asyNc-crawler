@@ -10,5 +10,10 @@
 
 ```shell
 scrapy crawl TencentNewsIncre [-a data_table='news'] [-a attribution='main']
-scrapy crawl TencentNewsAllQuantity -a begin_date='20220101' -a end_data='20221031' [-a data_table='news']
+scrapy crawl TencentNewsAllQuantity [-a begin_date='20220101'] [-a end_data='20221031'] [-a data_table='news']
+
+scrapy crawl XinhuaNewsIncre [-a data_table='news'] [-a attribution='main']
+scrapy crawl XinhuaNewsAllQuantity [-a begin_date='20220101'] [-a end_data='20221031'] [-a data_table='news']
+
+scrapy crawlall
 ```
