@@ -1,3 +1,7 @@
+'''
+Implement the crawlAllQuantity command
+'''
+
 import os
 import logging
 from scrapy.commands import ScrapyCommand
@@ -29,10 +33,12 @@ class Command(ScrapyCommand):
         Argument configuration
         '''
         ScrapyCommand.add_options(self, parser)
-        parser.add_option("-a", dest="spargs", action="append", default=[], metavar="NAME=VALUE",
+        parser.add_option("-a", dest="spargs", action="append",
+                          default=[], metavar="NAME=VALUE",
                           help="set spider argument (may be repeated)")
         parser.add_option("-o", "--output", metavar="FILE",
-                          help="dump scraped items into FILE (use - for stdout)")
+                          help="dump scraped items into FILE \
+                                (use - for stdout)")
         parser.add_option("-t", "--output-format", metavar="FORMAT",
                           help="format to use for dumping items with -o")
 
@@ -43,9 +49,10 @@ class Command(ScrapyCommand):
         ScrapyCommand.process_options(self, args, opts)
         try:
             opts.spargs = arglist_to_dict(opts.spargs)
-        except ValueError:
+        except ValueError as exc:
             raise UsageError(
-                "Invalid -a value, use -a NAME=VALUE", print_help=False)
+                "Invalid -a value, use -a NAME=VALUE",
+                print_help=False) from exc
         if opts.output:
             if opts.output == '-':
                 self.settings.set('FEED_URI', 'stdout:', priority='cmdline')
@@ -58,10 +65,12 @@ class Command(ScrapyCommand):
                 opts.output_format = os.path.splitext(
                     opts.output)[1].replace(".", "")
             if opts.output_format not in valid_output_formats:
-                raise UsageError("Unrecognized output format '%s', set one"
-                                 " using the '-t' switch or as a file extension"
-                                 " from the supported list %s" % (opts.output_format,
-                                                                  tuple(valid_output_formats)))
+                raise UsageError(f"Unrecognized output \
+                                   format '{opts.output_format}', set one"
+                                 f" using the '-t' switch or as \
+                                   a file extension"
+                                 f" from the supported list \
+                                   {tuple(valid_output_formats)}")
             self.settings.set(
                 'FEED_FORMAT', opts.output_format, priority='cmdline')
 

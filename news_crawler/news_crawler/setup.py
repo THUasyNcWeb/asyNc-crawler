@@ -1,3 +1,7 @@
+'''
+Configure crawler startup command
+'''
+
 from setuptools import setup
 
 setup(name='scrapy-mymodule',
