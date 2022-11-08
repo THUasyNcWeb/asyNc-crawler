@@ -147,7 +147,7 @@ class RpcClient:
 
         self.rpc_server = self.rpc_client.get_proxy()
 
-    def add_news(self, data_json):
+    def add_news(self, data):
         """_summary_
 
         Args:
@@ -157,10 +157,13 @@ class RpcClient:
             _type_: Success or not
         """
         try:
-            self.rpc_server.write_news(data_json)
+            data_dict = {}
+            for key in data.keys():
+                data_dict[key] = data[key]
+            self.rpc_server.write_news(data_dict)
             return True
         except Exception as error:
-            print(error)
+            logging.error(error)
             return False
 
 
