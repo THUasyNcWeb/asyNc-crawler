@@ -24,12 +24,16 @@ def parse_wangyi_to_item_loader(response):
         'title', '/html/head/meta[@property="og:title"]/@content')
     item_loader.add_value('category', '')
     item_loader.add_xpath(
-        'media', '//*[@id="container"]/div[1]/div[2]/a[1]/text()')
+        'media', '//div[@class="post_info"]/a[1]/text()')
+    item_loader.add_value('media', '网易')
+
     keywords = response.xpath(
         '/html/head/meta[@name="keywords"]/@content').extract_first()
     keywords.split(',')
     for keyword in keywords:
         item_loader.add_value('tags', keyword)
+    if len(keywords) == 0:
+        item_loader.add_value('tags', '')
     item_loader.add_xpath(
         'description', '/html/head/meta[@name="description"]/@content')
     paras = response.xpath(
@@ -40,6 +44,9 @@ def parse_wangyi_to_item_loader(response):
         item_loader.add_value('content', para)
     item_loader.add_xpath(
         'first_img_url', '/html/head/meta[@property="og:image"]/@content')
+    item_loader.add_xpath(
+        'first_img_url',
+        '//*[@id="content"]/div[@class="post_body"]//img/@src')
     item_loader.add_value('first_img_url', '')
     item_loader.add_xpath(
         'pub_time',
