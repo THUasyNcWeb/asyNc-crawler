@@ -20,22 +20,30 @@ def parse_wangyi_to_item_loader(response):
         item=NewsCrawlerItem(), response=response)
 
     item_loader.add_value('news_url', response.url)
-    item_loader.add_xpath('title', '/html/head/meta[@property="og:title"]/@content')
+    item_loader.add_xpath(
+        'title', '/html/head/meta[@property="og:title"]/@content')
     item_loader.add_value('category', '')
-    item_loader.add_xpath('media', '//*[@id="container"]/div[1]/div[2]/a[1]/text()')
-    keywords = response.xpath('/html/head/meta[@name="keywords"]/@content').extract_first()
+    item_loader.add_xpath(
+        'media', '//*[@id="container"]/div[1]/div[2]/a[1]/text()')
+    keywords = response.xpath(
+        '/html/head/meta[@name="keywords"]/@content').extract_first()
     keywords.split(',')
     for keyword in keywords:
         item_loader.add_value('tags', keyword)
-    item_loader.add_xpath('description', '/html/head/meta[@name="description"]/@content')
-    paras = response.xpath('//*[@id="content"]/div[@class="post_body"]/p/text()').extract()
+    item_loader.add_xpath(
+        'description', '/html/head/meta[@name="description"]/@content')
+    paras = response.xpath(
+        '//*[@id="content"]/div[@class="post_body"]/p/text()').extract()
     if len(paras) == 0:
         paras.append('')
     for para in paras:
         item_loader.add_value('content', para)
-    item_loader.add_xpath('first_img_url', '/html/head/meta[@property="og:image"]/@content')
+    item_loader.add_xpath(
+        'first_img_url', '/html/head/meta[@property="og:image"]/@content')
     item_loader.add_value('first_img_url', '')
-    item_loader.add_xpath('pub_time', '/html/head/meta[@property="article:published_time"]/@content')
+    item_loader.add_xpath(
+        'pub_time',
+        '/html/head/meta[@property="article:published_time"]/@content')
 
     return item_loader
 

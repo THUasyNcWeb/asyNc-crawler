@@ -195,11 +195,11 @@ class SQLPipeline:
                 ArticleType.init()
             except (elasticsearch.exceptions.ConnectionError, ConnectionError):
                 print("Elasticseach not run")
-        try:
-            self.rpc_client = RpcClient()
-        except Exception as error:
-            print(error)
-            print("Rpc Not Run")
+        # try:
+        #     self.rpc_client = RpcClient()
+        # except Exception as error:
+        #     print(error)
+        #     print("Rpc Not Run")
 
     def process_item(self, item, spider):
         '''
@@ -224,7 +224,7 @@ class SQLPipeline:
                 self.de_dul.insert(item['title'])
                 try:
                     write_to_es(item)
-                    self.rpc_client.add_news(item)
+                    # self.rpc_client.add_news(item)
                 except Exception as error:
                     print(error)
 
