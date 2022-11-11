@@ -108,8 +108,8 @@ class TencentNewsAllQuantitySpider(scrapy.Spider):
         '''
         super().__init__()
         self.data_table = kwargs.get('data_table', 'news')
-        self.begin_date = int(kwargs.get('begin_date', '20221001'))
-        self.end_date = int(kwargs.get('end_date', '20221031'))
+        self.begin_date = int(kwargs.get('begin_date', '20220101'))
+        self.end_date = int(kwargs.get('end_date', '20221111'))
         self.legal = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
                       'A', 'B', 'C', 'D', 'E', 'F', 'G',
                       'H', 'I', 'J', 'K', 'L', 'M', 'N',

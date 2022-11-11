@@ -120,7 +120,7 @@ class XinhuaNewsAllQuantitySpider(scrapy.Spider):
         super().__init__()
         self.data_table = kwargs.get('data_table', 'news')
         self.begin_date = int(kwargs.get('begin_date', '20220101'))
-        self.end_date = int(kwargs.get('end_date', '20221031'))
+        self.end_date = int(kwargs.get('end_date', '20221111'))
         self.legal_date = ((101, 131), (201, 228), (301, 331),
                            (401, 430), (501, 531), (601, 630),
                            (701, 731), (801, 831), (901, 930),

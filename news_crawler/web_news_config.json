@@ -34,5 +34,29 @@
         "http://www.news.cn/milpro/",
         "http://www.news.cn/governmentpro/",
         "http://www.news.cn/comments/index.html"
+    ],
+    "wangyi_news": [
+        "https://news.163.com/special/cm_yaowen20200213/?callback=data_callback",
+        "https://news.163.com/special/cm_yaowen20200213_02/?callback=data_callback",
+        "https://news.163.com/special/cm_yaowen20200213_03/?callback=data_callback",
+        "https://news.163.com/special/cm_yaowen20200213_04/?callback=data_callback",
+        "https://news.163.com/special/cm_yaowen20200213_05/?callback=data_callback",
+        "https://bendi.news.163.com/beijing/special/04388GGG/bjxinxiliu.js?callback=data_callback&_=1668159980745",
+        "https://bendi.news.163.com/beijing/special/04388GGG/bjxinxiliu_02.js?callback=data_callback&_=1668159940977",
+        "https://bendi.news.163.com/beijing/special/04388GGG/bjxinxiliu_03.js?callback=data_callback&_=1668159940977",
+        "https://bendi.news.163.com/beijing/special/04388GGG/bjxinxiliu_04.js?callback=data_callback&_=1668159940977",
+        "https://bendi.news.163.com/beijing/special/04388GGG/bjxinxiliu_05.js?callback=data_callback&_=1668159940977",
+        "https://bendi.news.163.com/beijing/special/04388GGG/bjxinxiliu_06.js?callback=data_callback&_=1668159940977",
+        "https://bendi.news.163.com/beijing/special/04388GGG/bjxinxiliu_07.js?callback=data_callback&_=1668159940977",
+        "https://bendi.news.163.com/beijing/special/04388GGG/bjxinxiliu_08.js?callback=data_callback&_=1668159940977",
+        "https://bendi.news.163.com/beijing/special/04388GGG/bjxinxiliu_09.js?callback=data_callback&_=1668159940977",
+        "https://bendi.news.163.com/beijing/special/04388GGG/bjxinxiliu_10.js?callback=data_callback&_=1668159940977",
+        "https://bendi.news.163.com/beijing/special/04388GGG/bjxinxiliu_02.js?callback=data_callback&_=1668159940977",
+        "https://news.163.com/special/cm_guonei/?callback=data_callback",
+        "https://news.163.com/special/cm_guonei_02/?callback=data_callback",
+        "https://news.163.com/special/cm_hangkong/?callback=data_callback",
+        "https://news.163.com/special/cm_hangkong_02/?callback=data_callback",
+        "https://gov.163.com/special/00239AOT/index2022_datalist.js?callback=data_callback&_=1668160717247",
+        "https://gongyi.163.com/special/00939807/datalist_gyrd.js?callback=datalist_gyrd&_=1668160834397"
     ]
 }
