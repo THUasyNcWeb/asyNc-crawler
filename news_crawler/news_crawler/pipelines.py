@@ -209,6 +209,7 @@ class SQLPipeline:
 
         try:
             if not dul_tag:
+                self.connection.commit()
                 query = f'INSERT INTO {spider.data_table}(news_url, media, \
                           category, tags, title, description, content, \
                           first_img_url, pub_time) \

@@ -40,8 +40,9 @@ def parse_wangyi_to_item_loader(response):
         '//*[@id="content"]/div[@class="post_body"]/p/text()').extract()
     if len(paras) == 0:
         paras.append('')
-    for para in paras:
-        item_loader.add_value('content', para)
+    else:
+        for para in paras:
+            item_loader.add_value('content', para)
     item_loader.add_xpath(
         'first_img_url', '/html/head/meta[@property="og:image"]/@content')
     item_loader.add_xpath(
