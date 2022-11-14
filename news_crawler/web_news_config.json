@@ -58,5 +58,13 @@
         "https://news.163.com/special/cm_hangkong_02/?callback=data_callback",
         "https://gov.163.com/special/00239AOT/index2022_datalist.js?callback=data_callback&_=1668160717247",
         "https://gongyi.163.com/special/00939807/datalist_gyrd.js?callback=datalist_gyrd&_=1668160834397"
+    ],
+    "china_daily_news": [
+        "https://www.chinadaily.com.cn/",
+        "https://www.chinadaily.com.cn/china",
+        "https://www.chinadaily.com.cn/world",
+        "https://www.chinadaily.com.cn/life",
+        "https://www.chinadaily.com.cn/culture",
+        "https://www.chinadaily.com.cn/sports"
     ]
 }
