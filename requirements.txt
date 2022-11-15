@@ -8,3 +8,7 @@ pyOpenSSL==22.0.0
 scrapy-redis
 redis
 schedule
+elasticsearch_dsl
+elasticsearch
+tinyrpc
+requests

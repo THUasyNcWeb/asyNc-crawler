@@ -23,15 +23,19 @@ def parse_xinhua_to_item_loader(response):
         item=NewsCrawlerItem(), response=response)
 
     item_loader.add_value('news_url', response.url)
-    media = response.xpath('//body//div[@class="source"]/text()')\
-                    .extract_first()
+    media = response.text
     item_loader.add_value('media', re.findall(r'\r\n来源：(.*)\r\n', media)[0])
-    item_loader.add_xpath('tags', '/html/head/meta[@name="keywords"]/@content')
+    item_loader.add_xpath(
+        'tags', '/html/head//meta[@name="keywords"]/@content')
+    item_loader.add_xpath(
+        'tags', '/html/body//meta[@name="keywords"]/@content')
     title = response.xpath('/html//title/text()').extract_first()
     item_loader.add_value('title', re.findall(r'\r\n(.*?)-新华网\r\n', title)[0])
     item_loader.add_xpath('title', '//span[@class="title"]/text()')
     item_loader.add_xpath('description',
-                          '/html/head/meta[@name="description"]/@content')
+                          '/html/head//meta[@name="description"]/@content')
+    item_loader.add_xpath('description',
+                          '/html/body//meta[@name="description"]/@content')
     item_loader.add_value('description', '')
 
     image_last = response.xpath('//img[@id]/@src').extract_first()
@@ -116,7 +120,7 @@ class XinhuaNewsAllQuantitySpider(scrapy.Spider):
         super().__init__()
         self.data_table = kwargs.get('data_table', 'news')
         self.begin_date = int(kwargs.get('begin_date', '20220101'))
-        self.end_date = int(kwargs.get('end_date', '20221031'))
+        self.end_date = int(kwargs.get('end_date', '20221111'))
         self.legal_date = ((101, 131), (201, 228), (301, 331),
                            (401, 430), (501, 531), (601, 630),
                            (701, 731), (801, 831), (901, 930),

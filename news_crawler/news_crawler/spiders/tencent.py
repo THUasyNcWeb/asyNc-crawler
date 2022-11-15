@@ -24,7 +24,7 @@ def parse_tencent_to_item_loader(response):
 
     item_loader.add_value('news_url', response.url)
     window_data = response.xpath(
-        '/html/head/script[7]/text()').extract_first()
+        '/html/head/script[8]/text()').extract_first()
     item_loader.add_value('media', re.findall(
         r'"media": "(.*?)"', window_data)[0])
     for catalog in re.findall(r'"catalog1": "(.*?)"', window_data):
@@ -108,15 +108,14 @@ class TencentNewsAllQuantitySpider(scrapy.Spider):
         '''
         super().__init__()
         self.data_table = kwargs.get('data_table', 'news')
-        self.begin_date = int(kwargs.get('begin_date', '20221001'))
-        self.end_date = int(kwargs.get('end_date', '20221031'))
+        self.begin_date = int(kwargs.get('begin_date', '20220101'))
+        self.end_date = int(kwargs.get('end_date', '20221111'))
         self.legal = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
                       'A', 'B', 'C', 'D', 'E', 'F', 'G',
                       'H', 'I', 'J', 'K', 'L', 'M', 'N',
                       'O', 'P', 'Q', 'R', 'S', 'T',
                       'U', 'V', 'W', 'X', 'Y', 'Z']
-        self.legal_first = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-                            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
+        self.legal_first = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
         self.legal_date = ((101, 131), (201, 228), (301, 331),
                            (401, 430), (501, 531), (601, 630),
                            (701, 731), (801, 831), (901, 930),
