@@ -66,5 +66,11 @@
         "https://www.chinadaily.com.cn/life",
         "https://www.chinadaily.com.cn/culture",
         "https://www.chinadaily.com.cn/sports"
+    ],
+    "xinhua_eng_news": [
+        "https://english.news.cn/",
+        "https://english.news.cn/china/index.htm",
+        "https://english.news.cn/world/index.htm",
+        "https://english.news.cn/photo/index.htm"
     ]
 }
